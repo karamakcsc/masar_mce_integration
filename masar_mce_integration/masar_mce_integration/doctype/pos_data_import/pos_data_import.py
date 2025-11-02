@@ -20,8 +20,8 @@ class POSDataImport(Document):
 		if not frappe.db.exists("POS Profile", self.pos_profile):
 			not_existing.append(f"POS Profile {self.pos_profile} does not exist.")
    
-		if not frappe.db.exists("POS Payment Method", self.payment_method):
-			not_existing.append(f"POS Payment Method {self.payment_method} does not exist.")
+		if not frappe.db.exists("Mode of Payment", self.payment_method):
+			not_existing.append(f"Mode of Payment {self.payment_method} does not exist.")
    
 		for i in self.items:
 			if not frappe.db.exists("Item", i.item_code):
@@ -48,7 +48,9 @@ class POSDataImport(Document):
 		warehouse = frappe.get_value("POS Profile", self.pos_profile, "warehouse")
   
 		for i in self.items:
-			get_bin = frappe.get_value("Bin", {"item_code": i.item_code, "warehouse": warehouse}, "actual_qty - reserved_qty")
+			actual_qty = frappe.get_value("Bin", {"item_code": i.item_code, "warehouse": warehouse}, "actual_qty")
+			reserved_qty = frappe.get_value("Bin", {"item_code": i.item_code, "warehouse": warehouse}, "reserved_qty")
+			get_bin = flt(actual_qty) - flt(reserved_qty)
 			if flt(i.quantity) > flt(get_bin):
 				not_available.append(f"Row {i.idx}: Item {i.item_code} has insufficient quantity. Available: {get_bin}, Required: {i.quantity}.")
 		if not_available:

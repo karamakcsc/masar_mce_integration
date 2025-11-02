@@ -225,7 +225,7 @@ def master_data_check_execute():
             SELECT 
                 name AS payment_method
             FROM 
-                `tabPOS Payment Method`
+                `tabMode of Payment`
         ),
         pos_with_status AS (
             SELECT 
@@ -322,7 +322,7 @@ def master_data_check_execute():
             LEFT JOIN 
                 valid_profiles vp 
             ON 
-                vp.pos_profile = CONCAT(t.pos_no, '-', t.market_description)
+                vp.pos_profile = CONCAT(t.market_description, '-', t.pos_no)
             LEFT JOIN 
                 valid_payments pm 
             ON 
