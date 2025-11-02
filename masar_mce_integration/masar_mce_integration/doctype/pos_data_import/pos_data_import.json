@@ -1,0 +1,174 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-29 14:41:43.481644",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_imsg",
+  "market_id",
+  "market_description",
+  "column_break_hrkw",
+  "amended_from",
+  "nielsen_code",
+  "pos_profile",
+  "section_break_czdj",
+  "posting_date",
+  "column_break_pkji",
+  "posting_time",
+  "section_break_cohv",
+  "items",
+  "section_break_szxk",
+  "total_quantity",
+  "billing_type",
+  "column_break_vuqn",
+  "invoice_total",
+  "payment_method",
+  "section_break_lukc",
+  "status",
+  "column_break_dmbj",
+  "rejected_reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_imsg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "POS Data Import",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "market_id",
+   "fieldtype": "Data",
+   "label": "Market ID"
+  },
+  {
+   "fieldname": "market_description",
+   "fieldtype": "Data",
+   "label": "Market Description"
+  },
+  {
+   "fieldname": "column_break_hrkw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nielsen_code",
+   "fieldtype": "Data",
+   "label": "Nielsen Code"
+  },
+  {
+   "fieldname": "section_break_czdj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "column_break_pkji",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "posting_time",
+   "fieldtype": "Time",
+   "label": "Posting Time"
+  },
+  {
+   "fieldname": "pos_profile",
+   "fieldtype": "Data",
+   "label": "POS Profile"
+  },
+  {
+   "fieldname": "section_break_cohv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "POS Data Import Item"
+  },
+  {
+   "fieldname": "section_break_szxk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_quantity",
+   "fieldtype": "Float",
+   "label": "Total Quantity"
+  },
+  {
+   "fieldname": "column_break_vuqn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "invoice_total",
+   "fieldtype": "Float",
+   "label": "Invoice Total"
+  },
+  {
+   "fieldname": "billing_type",
+   "fieldtype": "Data",
+   "label": "Billing Type"
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Data",
+   "label": "Payment Method"
+  },
+  {
+   "fieldname": "section_break_lukc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "column_break_dmbj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rejected_reason",
+   "fieldtype": "Small Text",
+   "label": "Rejected Reason"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-10-30 10:49:01.375433",
+ "modified_by": "Administrator",
+ "module": "Masar MCE Integration",
+ "name": "POS Data Import",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

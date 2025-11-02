@@ -1,0 +1,73 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "API-.",
+ "creation": "2025-11-02 11:43:30.610752",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_nkaf",
+  "amended_from",
+  "column_break_oowt",
+  "section_break_fszq",
+  "json"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_nkaf",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "API Data INcome",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_oowt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_fszq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "json",
+   "fieldtype": "Long Text",
+   "label": "Json"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-11-02 11:45:23.309017",
+ "modified_by": "Administrator",
+ "module": "Masar MCE Integration",
+ "name": "API Data Income",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

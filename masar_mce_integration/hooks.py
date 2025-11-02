@@ -241,4 +241,24 @@ app_license = "mit"
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
+fixtures = [
+    {"dt": "Custom Field", "filters": [
+        [
+            "dt", "in", [
+                'Sales Invoice'
+            ]
+        ]
+    ]},
+    {
+        "doctype": "Property Setter",
+        "filters": [
+            [
+                "doc_type",
+                "in",
+                [
+                    'Sales Invoice'
+                ]
+            ]
+        ]
+    }
+]

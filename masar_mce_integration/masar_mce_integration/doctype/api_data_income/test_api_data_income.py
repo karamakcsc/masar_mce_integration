@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestIncomingPOSData(FrappeTestCase):
+class TestAPIDataIncome(FrappeTestCase):
 	pass

@@ -1,12 +1,14 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-10-28 12:23:36.607477",
+ "creation": "2025-10-29 11:36:45.070081",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "market_id",
   "market_description",
+  "status",
+  "rejected_reason",
   "column_break_zfqp",
   "nielsen_code",
   "day",
@@ -54,18 +56,18 @@
    "label": "Nielsen Code"
   },
   {
+   "fieldname": "day",
+   "fieldtype": "Data",
+   "label": "Day"
+  },
+  {
    "fieldname": "date_timestamp",
-   "fieldtype": "Datetime",
+   "fieldtype": "Data",
    "label": "Date Timestamp"
   },
   {
    "fieldname": "section_break_pmqk",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "day",
-   "fieldtype": "Data",
-   "label": "Day"
   },
   {
    "fieldname": "receipt_no",
@@ -91,8 +93,9 @@
    "label": "Item Code"
   },
   {
-   "fieldname": "column_break_tepu",
-   "fieldtype": "Column Break"
+   "fieldname": "item_description",
+   "fieldtype": "Small Text",
+   "label": "Item Description"
   },
   {
    "fieldname": "barcode",
@@ -100,28 +103,27 @@
    "label": "Barcode"
   },
   {
-   "fieldname": "item_description",
-   "fieldtype": "Small Text",
-   "label": "Item Description"
+   "fieldname": "column_break_tepu",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "sales_price",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "Sales Price"
   },
   {
    "fieldname": "quantity",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "Quantity"
   },
   {
    "fieldname": "discount_percent",
-   "fieldtype": "Percent",
+   "fieldtype": "Data",
    "label": "Discount Percent"
   },
   {
    "fieldname": "discount_value",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "Discount Value"
   },
   {
@@ -130,8 +132,13 @@
   },
   {
    "fieldname": "invoice_total",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "Invoice Total"
+  },
+  {
+   "fieldname": "total_price",
+   "fieldtype": "Data",
+   "label": "Total Price"
   },
   {
    "fieldname": "date_description",
@@ -139,18 +146,18 @@
    "label": "Date Description"
   },
   {
-   "fieldname": "billing_type",
-   "fieldtype": "Data",
-   "label": "Billing Type"
-  },
-  {
    "fieldname": "column_break_epav",
    "fieldtype": "Column Break"
   },
   {
    "fieldname": "total_quantity",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "Total Quantity"
+  },
+  {
+   "fieldname": "billing_type",
+   "fieldtype": "Data",
+   "label": "Billing Type"
   },
   {
    "fieldname": "payment_method",
@@ -158,18 +165,26 @@
    "label": "Payment Method"
   },
   {
-   "fieldname": "total_price",
-   "fieldtype": "Float",
-   "label": "Total Price"
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status"
+  },
+  {
+   "fieldname": "rejected_reason",
+   "fieldtype": "Small Text",
+   "label": "Rejected Reason",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-28 13:05:27.692829",
+ "modified": "2025-10-29 11:38:46.493343",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
- "name": "Incoming POS Data",
+ "name": "POS Data Check",
  "owner": "Administrator",
  "permissions": [
   {

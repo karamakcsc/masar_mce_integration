@@ -1,0 +1,125 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-29 14:42:08.866377",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "barcode",
+  "column_break_edvt",
+  "item_description",
+  "section_break_kvjr",
+  "quantity",
+  "discount_percent",
+  "column_break_fqkh",
+  "sales_price",
+  "discount_value",
+  "section_break_wjqv",
+  "status",
+  "pos_data_check",
+  "column_break_bfpy",
+  "rejected_reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Item Code"
+  },
+  {
+   "fieldname": "barcode",
+   "fieldtype": "Data",
+   "label": "Barcode"
+  },
+  {
+   "fieldname": "item_description",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Item Description"
+  },
+  {
+   "fieldname": "column_break_edvt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_kvjr",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Quantity"
+  },
+  {
+   "fieldname": "column_break_fqkh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sales_price",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Sales Price"
+  },
+  {
+   "fieldname": "discount_percent",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Discount Percent"
+  },
+  {
+   "fieldname": "discount_value",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Discount Value"
+  },
+  {
+   "fieldname": "section_break_wjqv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "column_break_bfpy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rejected_reason",
+   "fieldtype": "Small Text",
+   "label": "Rejected Reason"
+  },
+  {
+   "fieldname": "pos_data_check",
+   "fieldtype": "Link",
+   "label": "POS Data Check",
+   "options": "POS Data Check",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-11-02 09:41:59.864970",
+ "modified_by": "Administrator",
+ "module": "Masar MCE Integration",
+ "name": "POS Data Import Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
