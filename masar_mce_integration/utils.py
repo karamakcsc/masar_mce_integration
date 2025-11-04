@@ -2,7 +2,12 @@ from frappe import db , _
 from frappe.utils import now
 from json import loads
 import frappe ,  time
-def bulk_insert_pos_data(data, batch_size=1000):
+def bulk_insert_pos_data(data,api_doc , batch_size=1000):
+    db.sql("""
+        DELETE FROM `tabPOS Data Income`
+        where status = 'LOADED'
+                  """)
+    db.commit()
     if not data:
         return {"status": "No data to insert", "count": 0}
     serial_number = frappe.db.sql("""
@@ -34,6 +39,7 @@ def bulk_insert_pos_data(data, batch_size=1000):
             "payment_method": row.get("payment_method"),
             "date_description": row.get("date_description"),
             "billing_type": row.get("billing_type"),
+            "status" : "NEW"
         })
         doc.insert(ignore_permissions=True)
         serial_number += 1
@@ -41,7 +47,7 @@ def bulk_insert_pos_data(data, batch_size=1000):
             frappe.db.commit()
     
     frappe.db.commit()
-
+    frappe.db.set_value("API Data Income", api_doc, "status", "COMPLETED")
     return {"status": "Bulk Insert Completed", "count": len(data)}
 
 
@@ -187,6 +193,12 @@ def data_quality_check_execute():
             tipd.billing_type,
             tipd.payment_method
         FROM `tabPOS Data Income` tipd""")
+    db.sql("""
+        UPDATE `tabPOS Data Income`
+        SET status = 'LOADED'
+        WHERE status != 'LOADED'
+    """)
+    db.commit()
     return {"status": "Data Quality Check Executed", "count": data_in_buffer}
 
 

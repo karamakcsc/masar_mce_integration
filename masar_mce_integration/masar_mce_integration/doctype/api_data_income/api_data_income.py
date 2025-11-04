@@ -12,6 +12,7 @@ class APIDataIncome(Document):
         frappe.enqueue(
             "masar_mce_integration.utils.bulk_insert_pos_data",
             data=records_list,
+            api_doc= self.name,
             queue='long',
             timeout=100000
         )

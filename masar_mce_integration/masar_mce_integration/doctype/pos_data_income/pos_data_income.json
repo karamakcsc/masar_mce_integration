@@ -7,6 +7,7 @@
  "field_order": [
   "market_id",
   "market_description",
+  "status",
   "column_break_zfqp",
   "nielsen_code",
   "day",
@@ -161,12 +162,17 @@
    "fieldname": "total_price",
    "fieldtype": "Data",
    "label": "Total Price"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-29 10:51:18.290322",
+ "modified": "2025-11-03 15:50:38.603637",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Income",

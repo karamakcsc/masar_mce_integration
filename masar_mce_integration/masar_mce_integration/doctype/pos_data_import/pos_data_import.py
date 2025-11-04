@@ -16,13 +16,11 @@ class POSDataImport(Document):
 
 	def check_existing_master_data(self):
 		not_existing = []
-		total_qty , total_amount = 0, 0
+		total_qty, total_amount = 0, 0
 		if not frappe.db.exists("POS Profile", self.pos_profile):
 			not_existing.append(f"POS Profile {self.pos_profile} does not exist.")
-   
 		if not frappe.db.exists("Mode of Payment", self.payment_method):
 			not_existing.append(f"Mode of Payment {self.payment_method} does not exist.")
-   
 		for i in self.items:
 			if not frappe.db.exists("Item", i.item_code):
 				not_existing.append(f"Row {i.idx}: Item {i.item_code} does not exist.")
@@ -32,21 +30,23 @@ class POSDataImport(Document):
 			not_existing.append(f"Total Quantity mismatch: Expected {self.total_quantity}, Found {total_qty}.")
 		if total_amount != flt(self.invoice_total):
 			not_existing.append(f"Total Amount mismatch: Expected {self.invoice_total}, Found {total_amount}.")
-   
 		if not_existing:
 			self.status = "Rejected"
 			self.rejected_reason = ", ".join(not_existing)
+			self.db_set("status", self.status)
+			self.db_set("rejected_reason", self.rejected_reason)
 		else:
 			self.status = "Master Data Checked"
 			self.rejected_reason = ""
-		if self.status == "Rejected" and self.docstatus == 1 :
+			self.db_set("status", self.status)
+			self.db_set("rejected_reason", self.rejected_reason)
+		if self.status == "Rejected" and self.docstatus == 1:
 			frappe.throw(self.rejected_reason)
    
    
 	def check_available_quantity(self):
 		not_available = []
 		warehouse = frappe.get_value("POS Profile", self.pos_profile, "warehouse")
-  
 		for i in self.items:
 			actual_qty = frappe.get_value("Bin", {"item_code": i.item_code, "warehouse": warehouse}, "actual_qty")
 			reserved_qty = frappe.get_value("Bin", {"item_code": i.item_code, "warehouse": warehouse}, "reserved_qty")
@@ -56,11 +56,13 @@ class POSDataImport(Document):
 		if not_available:
 			self.status = "Rejected"
 			self.rejected_reason = ", ".join(not_available)
-			if self.docstatus == 1 :
-				frappe.throw(self.rejected_reason)
 		else:
 			self.status = "Master Data Checked"
 			self.rejected_reason = ""
+		self.db_set("status", self.status)
+		self.db_set("rejected_reason", self.rejected_reason)
+		if self.status == "Rejected" and self.docstatus == 1:
+			frappe.throw(self.rejected_reason)
    
 	def create_sales_invoice(self):
 		warehouse = frappe.get_value("POS Profile", self.pos_profile, "warehouse")
@@ -93,13 +95,13 @@ class POSDataImport(Document):
 			si.submit()
 			self.status = "Submitted"
 			self.rejected_reason = ""
-			frappe.db.set_value("POS Data Import", self.name, "status", "Submitted")
 			for i in self.items:
 				frappe.db.set_value("POS Data Check", i.pos_check_name, "status", "Submitted")
-			frappe.db.commit()
 		except Exception as e:
 			self.status = "Rejected"
 			self.rejected_reason = f"Failed to submit Sales Invoice: {str(e)}"
-			if self.docstatus == 1 :
+			if self.docstatus == 1:
 				frappe.throw(self.rejected_reason)
-			return
+		finally:
+			self.db_set("status", self.status)
+			self.db_set("rejected_reason", self.rejected_reason)
