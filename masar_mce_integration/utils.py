@@ -2,53 +2,60 @@ from frappe import db , _
 from frappe.utils import now
 from json import loads
 import frappe ,  time
-def bulk_insert_pos_data(data,api_doc , batch_size=1000):
+import pandas as pd
+
+import pandas as pd
+from frappe import db, utils
+
+def bulk_insert_pos_data(data, api_doc, batch_size=10000):
     db.sql("""
         DELETE FROM `tabPOS Data Income`
-        where status = 'LOADED'
-                  """)
+        WHERE status = 'LOADED'
+    """)
     db.commit()
+
     if not data:
         return {"status": "No data to insert", "count": 0}
-    serial_number = frappe.db.sql("""
-        SELECT COALESCE(MAX(CAST(name AS UNSIGNED)), 0) 
+    serial_number = db.sql("""
+        SELECT COALESCE(MAX(CAST(name AS UNSIGNED)), 0)
         FROM `tabPOS Data Income`
     """, as_list=True)[0][0]
     serial_number = int(serial_number) + 1
-    for i, row in enumerate(data, 1):
-        doc = frappe.get_doc({
-            "doctype": "POS Data Income",
-            "name": serial_number,
-            "market_id": row.get("market_id"),
-            "nielsen_code": row.get("nielsen_code"),
-            "market_description": row.get("market_description"),
-            "date_timestamp": row.get("date_timestamp"),
-            "day": row.get("day"),
-            "receipt_no": row.get("receipt_no"),
-            "pos_no": row.get("pos_no"),
-            "item_code": row.get("item_code"),
-            "barcode": row.get("barcode"),
-            "item_description": row.get("item_description"),
-            "sales_price": row.get("sales_price"),
-            "quantity": row.get("quantity"),
-            "discount_percent": row.get("discount_percent"),
-            "discount_value": row.get("discount_value"),
-            "total_price": row.get("total_price"),
-            "invoice_total": row.get("invoice_total"),
-            "total_quantity": row.get("total_quantity"),
-            "payment_method": row.get("payment_method"),
-            "date_description": row.get("date_description"),
-            "billing_type": row.get("billing_type"),
-            "status" : "NEW"
-        })
-        doc.insert(ignore_permissions=True)
-        serial_number += 1
-        if i % batch_size == 0:
-            frappe.db.commit()
-    
-    frappe.db.commit()
-    frappe.db.set_value("API Data Income", api_doc, "status", "COMPLETED")
+
+    now_str = utils.now()
+    df = pd.DataFrame(data)
+    df["name"] = range(serial_number, serial_number + len(df))
+    df["creation"] = now_str
+    df["modified"] = now_str
+    df["owner"] = frappe.session.user
+    df["modified_by"] = frappe.session.user
+    df["status"] = "NEW"
+    insert_fields = [
+        "name", "creation", "modified", "owner", "modified_by",
+        "market_id", "nielsen_code", "market_description", "date_timestamp",
+        "day", "receipt_no", "pos_no", "item_code", "barcode", "item_description",
+        "sales_price", "quantity", "discount_percent", "discount_value", "total_price",
+        "invoice_total", "total_quantity", "payment_method", "date_description",
+        "billing_type", "status"
+    ]
+    for field in insert_fields:
+        if field not in df.columns:
+            df[field] = None
+    total_rows = len(df)
+    placeholders = "(" + ",".join(["%s"] * len(insert_fields)) + ")"
+    for i in range(0, total_rows, batch_size):
+        batch_df = df.iloc[i:i + batch_size]
+        values = [tuple(batch_df[field].iloc[j] for field in insert_fields)
+                  for j in range(len(batch_df))]
+        db.sql(f"""
+            INSERT INTO `tabPOS Data Income` (
+                {", ".join(insert_fields)}
+            ) VALUES {", ".join([placeholders] * len(values))}
+        """, [v for row in values for v in row])
+        db.commit()
+    db.set_value("API Data Income", api_doc, "status", "COMPLETED")
     return {"status": "Bulk Insert Completed", "count": len(data)}
+
 
 
 def check_quality_incoming_data():

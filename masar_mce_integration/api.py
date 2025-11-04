@@ -15,7 +15,7 @@ def pos_data_integration():
 @frappe.whitelist()
 def pos_data_execution():
     frappe.enqueue(
-        "masar_mce_integration.utils.pos_data_execution_wait_and_run",
+        "masar_mce_integration.api.pos_data_execution_wait_and_run",
         queue='default',
         timeout=600
     )
@@ -26,13 +26,13 @@ def pos_data_execution_wait_and_run():
     not_completed_count = frappe.db.count("API Data Income", {"status": ["!=", "COMPLETED"]})
     if not_completed_count == 0:
         frappe.enqueue(
-            "masar_mce_integration.utils.pos_data_execution_enq",
+            "masar_mce_integration.api.pos_data_execution_enq",
             queue='long',
             timeout=200000
         )
         return
     frappe.enqueue(
-        "masar_mce_integration.utils.pos_data_execution_wait_and_run",
+        "masar_mce_integration.api.pos_data_execution_wait_and_run",
         queue='default',
         timeout=600,
         job_name="POS Wait Loop",
