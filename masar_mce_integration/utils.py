@@ -4,9 +4,6 @@ from json import loads
 import frappe ,  time
 import pandas as pd
 
-import pandas as pd
-from frappe import db, utils
-
 def bulk_insert_pos_data(data, api_doc, batch_size=10000):
     db.sql("""
         DELETE FROM `tabPOS Data Income`
@@ -22,7 +19,7 @@ def bulk_insert_pos_data(data, api_doc, batch_size=10000):
     """, as_list=True)[0][0]
     serial_number = int(serial_number) + 1
 
-    now_str = utils.now()
+    now_str = now()
     df = pd.DataFrame(data)
     df["name"] = range(serial_number, serial_number + len(df))
     df["creation"] = now_str
@@ -63,7 +60,7 @@ def check_quality_incoming_data():
     if data_in_buffer == 0:
         return {"status": "No Data in Buffer", "count": data_in_buffer}
     value = data_quality_check_execute()
-    return value 
+    master_data_check() 
     
 def data_quality_check_execute():
     data_in_buffer = db.sql("SELECT IFNULL(COUNT(*) , 0 ) From `tabPOS Data Income`")[0][0]
@@ -474,7 +471,7 @@ def master_data_check_execute():
     frappe.flags.mute_emails = False
     frappe.flags.in_migrate = False
     print(f"Done — Inserted {total_processed} parents in {round(time.time() - start_time, 2)} seconds")
-    return {"status": "Master Data Check Executed", "count": total_processed}
+    create_sales_invoice_from_data_import()
 
 
 def insert_batches(parent_values, child_values):

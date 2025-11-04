@@ -1,5 +1,5 @@
 import frappe , json , time
-from masar_mce_integration.utils import check_quality_incoming_data , master_data_check , create_sales_invoice_from_data_import
+from masar_mce_integration.utils import check_quality_incoming_data
 @frappe.whitelist()
 def pos_data_integration():
     data_from_api = frappe.request.get_data()
@@ -44,5 +44,5 @@ def pos_data_execution_wait_and_run():
 
 def pos_data_execution_enq():
     check_quality_incoming_data()
-    master_data_check()
-    create_sales_invoice_from_data_import()
+    
+    
