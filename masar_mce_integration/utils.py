@@ -60,7 +60,7 @@ def check_quality_incoming_data():
     if data_in_buffer == 0:
         return {"status": "No Data in Buffer", "count": data_in_buffer}
     value = data_quality_check_execute()
-    master_data_check() 
+    
     
 def data_quality_check_execute():
     data_in_buffer = db.sql("SELECT IFNULL(COUNT(*) , 0 ) From `tabPOS Data Income`")[0][0]
@@ -471,7 +471,6 @@ def master_data_check_execute():
     frappe.flags.mute_emails = False
     frappe.flags.in_migrate = False
     print(f"Done — Inserted {total_processed} parents in {round(time.time() - start_time, 2)} seconds")
-    create_sales_invoice_from_data_import()
 
 
 def insert_batches(parent_values, child_values):
