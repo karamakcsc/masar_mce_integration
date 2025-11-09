@@ -73,6 +73,7 @@ class POSDataImport(Document):
 		si.posting_date = self.posting_date
 		si.posting_time = self.posting_time
 		si.custom_pos_data_import = self.name
+		si.customer = frappe.db.get_value("POS Profile", self.pos_profile, "customer")
 		si.update_stock = 1
 		si.set_warehouse = warehouse
 		for i in self.items:
@@ -96,7 +97,7 @@ class POSDataImport(Document):
 			self.status = "Submitted"
 			self.rejected_reason = ""
 			for i in self.items:
-				frappe.db.set_value("POS Data Check", i.pos_check_name, "status", "Submitted")
+				frappe.db.set_value("POS Data Check", i.pos_data_check, "status", "Submitted")
 		except Exception as e:
 			self.status = "Rejected"
 			self.rejected_reason = f"Failed to submit Sales Invoice: {str(e)}"
