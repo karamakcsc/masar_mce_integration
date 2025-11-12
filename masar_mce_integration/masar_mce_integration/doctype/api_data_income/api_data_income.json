@@ -12,6 +12,8 @@
   "column_break_oowt",
   "status",
   "amended_from",
+  "new_count",
+  "duplicate_count",
   "section_break_fszq",
   "json"
  ],
@@ -66,13 +68,23 @@
    "fieldname": "posting_time",
    "fieldtype": "Time",
    "label": "Posting Time"
+  },
+  {
+   "fieldname": "new_count",
+   "fieldtype": "Int",
+   "label": "New Count"
+  },
+  {
+   "fieldname": "duplicate_count",
+   "fieldtype": "Int",
+   "label": "Duplicate Count"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-11 14:54:30.090396",
+ "modified": "2025-11-12 12:29:37.864720",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "API Data Income",
