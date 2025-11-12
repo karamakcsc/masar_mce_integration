@@ -13,6 +13,9 @@
   "nielsen_code",
   "day",
   "date_timestamp",
+  "imported",
+  "primary_key",
+  "api_ref",
   "section_break_pmqk",
   "receipt_no",
   "column_break_wtxu",
@@ -176,12 +179,29 @@
    "fieldtype": "Small Text",
    "label": "Rejected Reason",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "imported",
+   "fieldtype": "Check",
+   "label": "Imported"
+  },
+  {
+   "fieldname": "api_ref",
+   "fieldtype": "Link",
+   "label": "API Data Income",
+   "options": "API Data Income"
+  },
+  {
+   "fieldname": "primary_key",
+   "fieldtype": "Data",
+   "label": "Primary Key"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-29 11:38:46.493343",
+ "modified": "2025-11-12 12:14:49.345458",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Check",

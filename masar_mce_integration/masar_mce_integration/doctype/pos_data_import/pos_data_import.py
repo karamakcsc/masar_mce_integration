@@ -9,9 +9,10 @@ class POSDataImport(Document):
 	def validate(self):
 		self.check_existing_master_data()
 		self.check_available_quantity()
-	def on_submit(self):
+	def on_submit(self):		
 		self.check_existing_master_data()
 		self.check_available_quantity()
+		self.check_duplicate_invoice()
 		self.create_sales_invoice()
 
 	def check_existing_master_data(self):
@@ -63,8 +64,24 @@ class POSDataImport(Document):
 		self.db_set("rejected_reason", self.rejected_reason)
 		if self.status == "Rejected" and self.docstatus == 1:
 			frappe.throw(self.rejected_reason)
-   
+	def check_duplicate_invoice(self):
+		exist_pos = frappe.db.sql(f"SELECT name  , docstatus , status FROM `tab{self.doctype}` WHERE name != '{self.name} AND primary_key = '{self.primary_key}' " , as_dict = True)
+		if len(exist_pos) == 0: 
+			return 
+		for e in exist_pos:
+			if e.docstatus == 1 and e.status == 'SUCCESSFUL' : 
+				self.db_set("status","DUPLICATE")
+				self.db_set("rejected_reason", f"DUPLICATE Invoice from {e.name}")
+			elif e.docstatus == 0 : 
+				previous = frappe.get_doc(self.docstype , e.name)
+				previous.status = "DUPLICATE"
+				previous.rejected_reason = f"New Import {self.name} have been Submitted for this Invoice"
+				previous.save()
 	def create_sales_invoice(self):
+		if self.status != "Master Data Checked":
+			self.db_set("status", self.status)
+			self.db_set("rejected_reason", self.rejected_reason)
+			frappe.throw(self.rejected_reason)
 		warehouse = frappe.get_value("POS Profile", self.pos_profile, "warehouse")
 		si = frappe.new_doc("Sales Invoice")
 		si.is_pos = 1 
@@ -94,10 +111,10 @@ class POSDataImport(Document):
 		si.save()
 		try:
 			si.submit()
-			self.status = "Submitted"
+			self.status = "SUCCESSFUL"
 			self.rejected_reason = ""
 			for i in self.items:
-				frappe.db.set_value("POS Data Check", i.pos_data_check, "status", "Submitted")
+				frappe.db.set_value("POS Data Check", i.pos_data_check, "status", "SUCCESSFUL")
 		except Exception as e:
 			self.status = "Rejected"
 			self.rejected_reason = f"Failed to submit Sales Invoice: {str(e)}"

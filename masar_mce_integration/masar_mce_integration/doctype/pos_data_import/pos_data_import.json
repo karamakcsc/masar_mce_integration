@@ -8,6 +8,8 @@
   "section_break_imsg",
   "market_id",
   "market_description",
+  "pos_no",
+  "primary_key",
   "column_break_hrkw",
   "amended_from",
   "nielsen_code",
@@ -141,13 +143,23 @@
    "fieldname": "rejected_reason",
    "fieldtype": "Small Text",
    "label": "Rejected Reason"
+  },
+  {
+   "fieldname": "pos_no",
+   "fieldtype": "Data",
+   "label": "POS No"
+  },
+  {
+   "fieldname": "primary_key",
+   "fieldtype": "Data",
+   "label": "Primary Key"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-30 10:49:01.375433",
+ "modified": "2025-11-12 12:15:59.776414",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Import",

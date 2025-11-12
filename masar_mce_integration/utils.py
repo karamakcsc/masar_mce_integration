@@ -10,50 +10,89 @@ def bulk_insert_pos_data(data, api_doc, batch_size=10000):
         WHERE status = 'LOADED'
     """)
     db.commit()
-
     if not data:
         return {"status": "No data to insert", "count": 0}
-    serial_number = db.sql("""
-        SELECT COALESCE(MAX(CAST(name AS UNSIGNED)), 0)
-        FROM `tabPOS Data Income`
-    """, as_list=True)[0][0]
-    serial_number = int(serial_number) + 1
 
     now_str = now()
     df = pd.DataFrame(data)
-    df["name"] = range(serial_number, serial_number + len(df))
-    df["creation"] = now_str
-    df["modified"] = now_str
-    df["owner"] = frappe.session.user
-    df["modified_by"] = frappe.session.user
-    df["status"] = "NEW"
-    insert_fields = [
-        "name", "creation", "modified", "owner", "modified_by",
-        "market_id", "nielsen_code", "market_description", "date_timestamp",
-        "day", "receipt_no", "pos_no", "item_code", "barcode", "item_description",
-        "sales_price", "quantity", "discount_percent", "discount_value", "total_price",
-        "invoice_total", "total_quantity", "payment_method", "date_description",
-        "billing_type", "status"
-    ]
-    for field in insert_fields:
+    for field in ["pos_no", "receipt_no", "market_id", "date_timestamp"]:
         if field not in df.columns:
             df[field] = None
-    total_rows = len(df)
-    placeholders = "(" + ",".join(["%s"] * len(insert_fields)) + ")"
-    for i in range(0, total_rows, batch_size):
-        batch_df = df.iloc[i:i + batch_size]
-        values = [tuple(batch_df[field].iloc[j] for field in insert_fields)
-                  for j in range(len(batch_df))]
-        db.sql(f"""
-            INSERT INTO `tabPOS Data Income` (
-                {", ".join(insert_fields)}
-            ) VALUES {", ".join([placeholders] * len(values))}
-        """, [v for row in values for v in row])
-        db.commit()
+
+    df["year"] = pd.to_datetime(df["date_timestamp"], errors="coerce").dt.year.fillna(0).astype(int)
+    df["primary_key"] = ( df["pos_no"].astype(str)+ "-"+ df["receipt_no"].astype(str)+ "-"+ df["year"].astype(str)+ "-"+ df["market_id"].astype(str))
+    primary_keys = tuple(df["primary_key"].tolist())
+    existing_keys = set()
+    if primary_keys:
+        placeholders = ", ".join(["%s"] * len(primary_keys))
+        existing_keys = set(
+            x[0]
+            for x in db.sql(
+                f"""
+                SELECT primary_key
+                FROM `tabPOS Data Import`
+                WHERE primary_key IN ({placeholders})
+                AND docstatus = 1
+                AND status = 'SUCCESSFUL'
+                """,
+                primary_keys,
+            )
+        )
+
+    df["status"] = df["primary_key"].apply(lambda x: "DUPLICATE" if x in existing_keys else "NEW")
+
+    new_df = df[df["status"] == "NEW"].copy()
+    duplicate_count = len(df) - len(new_df)
+    new_count = len(new_df)
+    if new_count > 0:
+        serial_number = db.sql(
+            """SELECT COALESCE(MAX(CAST(name AS UNSIGNED)), 0) FROM `tabPOS Data Income`""",
+            as_list=True,
+        )[0][0]
+        serial_number = int(serial_number or 0) + 1
+
+        new_df["name"] = range(serial_number, serial_number + len(new_df))
+        new_df["creation"] = now_str
+        new_df["modified"] = now_str
+        new_df["owner"] = frappe.session.user
+        new_df["modified_by"] = frappe.session.user
+        new_df["api_ref"] = api_doc
+        insert_fields = [
+            "name", "creation", "modified", "owner", "modified_by",
+            "market_id", "nielsen_code", "market_description", "date_timestamp",
+            "day", "receipt_no", "pos_no", "item_code", "barcode", "item_description",
+            "sales_price", "quantity", "discount_percent", "discount_value", "total_price",
+            "invoice_total", "total_quantity", "payment_method", "date_description",
+            "billing_type", "primary_key", "status", "api_ref"
+        ]
+
+        for field in insert_fields:
+            if field not in new_df.columns:
+                new_df[field] = None
+
+        placeholders = "(" + ",".join(["%s"] * len(insert_fields)) + ")"
+        total_rows = len(new_df)
+
+        for i in range(0, total_rows, batch_size):
+            batch_df = new_df.iloc[i:i + batch_size]
+            values = [
+                tuple(batch_df[field].iloc[j] for field in insert_fields)
+                for j in range(len(batch_df))
+            ]
+            db.sql(f"""
+                INSERT INTO `tabPOS Data Income`
+                ({", ".join(insert_fields)})
+                VALUES {", ".join([placeholders] * len(values))}
+            """, [v for row in values for v in row])
+            db.commit()
     db.set_value("API Data Income", api_doc, "status", "COMPLETED")
-    return {"status": "Bulk Insert Completed", "count": len(data)}
-
-
+    db.set_value("API Data Income", api_doc, "new_count", new_count)
+    db.set_value("API Data Income", api_doc, "duplicate_count", duplicate_count)
+    return {
+        "status": "Bulk Insert Completed",
+        "new_count": new_count,
+        "duplicate_count": duplicate_count
+    }
 
 def check_quality_incoming_data():
     data_in_buffer = db.sql("SELECT IFNULL(COUNT(*) , 0 ) From `tabPOS Data Income`")[0][0]
@@ -63,16 +102,19 @@ def check_quality_incoming_data():
     
     
 def data_quality_check_execute():
+    user_ = frappe.session.user
     data_in_buffer = db.sql("SELECT IFNULL(COUNT(*) , 0 ) From `tabPOS Data Income`")[0][0]
     db.sql("""SET @base := (
             SELECT IFNULL(MAX(CAST(name AS UNSIGNED)), 100000000000000000)
             FROM `tabPOS Data Check`
             );""")
-    db.sql("""
+    db.sql(f"""
         INSERT INTO `tabPOS Data Check` (
             name,
             creation,
             modified,
+            modified_by, 
+            owner,
             market_id,
             market_description,
             status,
@@ -94,12 +136,16 @@ def data_quality_check_execute():
             date_description,
             total_quantity,
             billing_type,
-            payment_method
+            payment_method,
+            api_ref,
+            primary_key
         )
         SELECT
             LPAD(@base := @base + 1, 18, '0') AS name,
             NOW() AS creation,
             NOW() AS modified,
+            '{user_}' AS modified_by,
+            '{user_}' AS owner,
             tipd.market_id,
             tipd.market_description,
             CASE 
@@ -195,12 +241,14 @@ def data_quality_check_execute():
             tipd.date_description,
             tipd.total_quantity,
             tipd.billing_type,
-            tipd.payment_method
+            tipd.payment_method, 
+            tipd.api_ref,
+            tipd.primary_key
         FROM `tabPOS Data Income` tipd""")
     db.sql("""
         UPDATE `tabPOS Data Income`
         SET status = 'LOADED'
-        WHERE status != 'LOADED'
+        WHERE status = 'NEW'
     """)
     db.commit()
     return {"status": "Data Quality Check Executed", "count": data_in_buffer}
@@ -208,14 +256,18 @@ def data_quality_check_execute():
 
 
 def master_data_check():
-    no_of_rows = db.sql("SELECT IFNULL(COUNT(*), 0) FROM `tabPOS Data Check` WHERE status = 'Quality Checked'")[0][0]
+    no_of_rows = db.sql("""
+        SELECT IFNULL(COUNT(*), 0) 
+        FROM `tabPOS Data Check` 
+        WHERE status IN ('Quality Checked', 'Rejected') 
+        AND imported = 0
+    """)[0][0]
     if no_of_rows == 0:
-        return {"status": "No Data in Master Data Check With Quality Checked Status", "count": no_of_rows}
-    value = master_data_check_execute()
-    return value
-    
-    
+        return {"status": "No Data in Master Data Check With Quality Checked or Rejected Status", "count": no_of_rows}
+    value = master_data_check_execute()  
+    return value  
 
+ 
 def master_data_check_execute():
     frappe.clear_cache()
     frappe.flags.in_import = True
@@ -267,10 +319,12 @@ def master_data_check_execute():
             ON 
                 t.item_code = i.item_code
             WHERE 
-                t.status = 'Quality Checked'
+                t.status IN ('Quality Checked', 'Rejected')
+                AND t.imported = 0
         ),
         aggregated_pos AS (
             SELECT
+                t.primary_key,
                 t.pos_no,
                 t.market_id,
                 t.market_description,
@@ -303,6 +357,8 @@ def master_data_check_execute():
                 ) AS rejected_items_count,
                 t.billing_type,
                 t.payment_method,
+                MAX(t.status) as original_quality_status,
+                MAX(t.rejected_reason) as quality_rejected_reason,
                 TRIM(BOTH ', ' FROM 
                     GROUP_CONCAT(
                         DISTINCT 
@@ -319,7 +375,7 @@ def master_data_check_execute():
                 ) AS payment_methods,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
-                    	'pos_check_name' , t.name ,
+                        'pos_check_name', t.name,
                         'item_code', t.item_code,
                         'item_description', t.item_description,
                         'barcode', t.barcode,
@@ -328,7 +384,9 @@ def master_data_check_execute():
                         'discount_percent', t.discount_percent,
                         'discount_value', t.discount_value,
                         'status', t.item_status,
-                        'rejected_reason', t.item_rejected_reason
+                        'rejected_reason', t.item_rejected_reason,
+                        'quality_status', t.status,
+                        'quality_rejected_reason', t.rejected_reason
                     )
                 ) AS items,
                 MAX(CASE WHEN vp.pos_profile IS NOT NULL THEN 1 ELSE 0 END) AS profile_exists,
@@ -348,6 +406,8 @@ def master_data_check_execute():
             ),
         pos_json AS (
             SELECT
+                primary_key, 
+                pos_no,
                 market_id,
                 pos_profile,
                 market_description,
@@ -362,17 +422,19 @@ def master_data_check_execute():
                 billing_type,
                 payment_method,
                 CASE 
+                    WHEN original_quality_status = 'Rejected' THEN 'Quality Rejected'
                     WHEN rejected_items_count > 0
                         OR ABS(COALESCE(invoice_amount, 0) - COALESCE(invoice_total, 0)) > 0.01
                         OR COALESCE(total_quantity, 0) <> COALESCE(actual_quantity, 0)
                         OR profile_exists = 0
                         OR payment_method_exists = 0
-                    THEN 'Rejected'
+                    THEN 'Master Data Rejected'
                     ELSE 'Master Data Checked'
                 END AS status,
                 TRIM(BOTH ', ' FROM 
                     NULLIF(
                         CONCAT_WS(', ',
+                            CASE WHEN original_quality_status = 'Rejected' THEN quality_rejected_reason ELSE NULL END,
                             CASE WHEN NULLIF(item_rejected_reasons, '') IS NOT NULL THEN item_rejected_reasons ELSE NULL END,
                             CASE WHEN profile_exists = 0 THEN CONCAT('POS profile not found: ', pos_profile) ELSE NULL END,
                             CASE WHEN payment_method_exists = 0 THEN CONCAT('Payment method not found: ', payment_methods) ELSE NULL END,
@@ -391,6 +453,8 @@ def master_data_check_execute():
         )
         SELECT 
             JSON_OBJECT(
+                'primary_key; , primary_key, 
+                'pos_no, pos_no , 
                 'market_id', market_id,
                 'market_description', market_description,
                 'nielsen_code', nielsen_code,
@@ -409,17 +473,12 @@ def master_data_check_execute():
     """, as_dict=True)
     parent_values = []
     child_values = []
+    pos_check_names_to_update = set()  
     batch_size = 5000
     total_processed = 0
     now_str = now()
-    serial_number = frappe.db.get_value("POS Data Import", "max(name)", as_dict=False)
-    if not serial_number:
-        serial_number = 1
-    else:
-        try:
-            serial_number = int(serial_number) + 1
-        except ValueError:
-            serial_number = 1
+    serial_number_result = db.sql("SELECT COALESCE(MAX(CAST(name AS UNSIGNED)), 0) FROM `tabPOS Data Import`")
+    serial_number = int(serial_number_result[0][0]) + 1 if serial_number_result else 1
     for record in pos_invoice:
         data = loads(record.row_data)
         parent_name = f"{serial_number:018d}"
@@ -431,6 +490,7 @@ def master_data_check_execute():
             data.get("status"),
             data.get("market_id"),
             data.get("market_description"),
+            data.get("pos_no"),
             data.get("nielsen_code"),
             data.get("pos_profile"),
             data.get("posting_date"),
@@ -441,7 +501,12 @@ def master_data_check_execute():
             data.get("payment_method"),
             data.get("rejected_reason"),
         ])
+
         for idx, item in enumerate(data.get("items", []), start=1):
+            pos_check_name = item.get("pos_check_name")
+            if pos_check_name:
+                pos_check_names_to_update.add(pos_check_name)
+            rejected_reason = item.get('quality_rejected_reason') or item.get('rejected_reason') or "" 
             child_values.append([
                 frappe.generate_hash(length=20),
                 now_str, now_str, frappe.session.user, frappe.session.user,
@@ -455,31 +520,53 @@ def master_data_check_execute():
                 item.get("discount_percent"),
                 item.get("discount_value"),
                 item.get("status"),
-                item.get("rejected_reason"),
-                item.get("pos_check_name")
+                rejected_reason,
+                pos_check_name
             ])
 
         total_processed += 1
         if total_processed % batch_size == 0:
             insert_batches(parent_values, child_values)
+            if pos_check_names_to_update:
+                mark_pos_check_as_imported(pos_check_names_to_update)
+                pos_check_names_to_update.clear()          
             parent_values.clear()
-            child_values.clear()
+            child_values.clear()   
     if parent_values:
         insert_batches(parent_values, child_values)
+        
+    if pos_check_names_to_update:
+        mark_pos_check_as_imported(pos_check_names_to_update)
     db.commit()
     frappe.flags.in_import = False
     frappe.flags.mute_emails = False
-    frappe.flags.in_migrate = False
+    frappe.flags.in_migrate = False 
     print(f"Done — Inserted {total_processed} parents in {round(time.time() - start_time, 2)} seconds")
-
-
+    return {"status": "Master Data Check Executed", "count": total_processed}
+def mark_pos_check_as_imported(pos_check_names):
+    if not pos_check_names:
+        return
+    names_tuple = tuple(pos_check_names)
+    if len(names_tuple) == 1:
+        db.sql("""
+            UPDATE `tabPOS Data Check`
+            SET imported = 1
+            WHERE name = %s
+        """, names_tuple[0])
+    else:
+        db.sql(f"""
+            UPDATE `tabPOS Data Check`
+            SET imported = 1
+            WHERE name IN {names_tuple}
+        """)
+        
 def insert_batches(parent_values, child_values):
     if parent_values:
         db.bulk_insert(
             "POS Data Import",
             [
                 "name", "creation", "modified", "owner", "modified_by",
-                "docstatus", "status", "market_id", "market_description",
+                "docstatus", "status", "market_id", "market_description", "pos_no",
                 "nielsen_code", "pos_profile", "posting_date", "posting_time",
                 "total_quantity", "invoice_total", "billing_type",
                 "payment_method", "rejected_reason",
@@ -504,7 +591,7 @@ def insert_batches(parent_values, child_values):
         )
         
 def create_sales_invoice_from_data_import():
-    no_of_rows = db.sql("SELECT IFNULL(COUNT(*), 0) FROM `tabPOS Data Import` WHERE status = 'Master Data Checked' AND docstatus = 0")[0][0]
+    no_of_rows = db.sql("SELECT IFNULL(COUNT(*), 0) FROM `tabPOS Data Import` WHERE  docstatus = 0")[0][0]
     if no_of_rows == 0:
         return {"status": "No Data in POS Data Import With Master Data Checked Status", "count": no_of_rows}
     value = create_sales_invoice_from_data_import_execute()
@@ -519,8 +606,6 @@ def create_sales_invoice_from_data_import_execute():
             `tabPOS Data Import` tpdi 
         WHERE 
             tpdi.docstatus =0 
-        AND 
-            tpdi.status = 'Master Data Checked'
         ORDER BY 
             tpdi.posting_date  , 
             tpdi.posting_time 

@@ -8,10 +8,12 @@
   "market_id",
   "market_description",
   "status",
+  "primary_key",
   "column_break_zfqp",
   "nielsen_code",
   "day",
   "date_timestamp",
+  "api_ref",
   "section_break_pmqk",
   "receipt_no",
   "column_break_wtxu",
@@ -167,12 +169,23 @@
    "fieldname": "status",
    "fieldtype": "Data",
    "label": "Status"
+  },
+  {
+   "fieldname": "api_ref",
+   "fieldtype": "Link",
+   "label": "API Data Income",
+   "options": "API Data Income"
+  },
+  {
+   "fieldname": "primary_key",
+   "fieldtype": "Data",
+   "label": "Primary Key"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-03 15:50:38.603637",
+ "modified": "2025-11-12 12:14:28.575794",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Income",

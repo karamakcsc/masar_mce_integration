@@ -1,15 +1,17 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "API-.",
+ "autoname": "format:API-{YY}-{MM}-{DD}-{#####}",
  "creation": "2025-11-02 11:43:30.610752",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "section_break_nkaf",
-  "amended_from",
+  "posting_date",
+  "posting_time",
+  "batch_size",
   "column_break_oowt",
   "status",
+  "amended_from",
   "section_break_fszq",
   "json"
  ],
@@ -47,17 +49,34 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "QUEUE\nCOMPLETED"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "batch_size",
+   "fieldtype": "Int",
+   "label": "Batch Size"
+  },
+  {
+   "default": "Now",
+   "fieldname": "posting_time",
+   "fieldtype": "Time",
+   "label": "Posting Time"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-04 12:21:36.545580",
+ "modified": "2025-11-11 14:54:30.090396",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "API Data Income",
- "naming_rule": "Expression (old style)",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

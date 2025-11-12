@@ -5,6 +5,11 @@ import frappe , json , ast
 from frappe.model.document import Document
 
 class APIDataIncome(Document):
+    def validate(self):
+        json_str = self.get('json', "{'records':[]}")
+        data_dict = ast.literal_eval(json_str) 
+        records_list = data_dict.get("records", [])
+        self.batch_size = len(records_list)
     def on_submit(self):
         json_str = self.get('json', "{'records':[]}")
         data_dict = ast.literal_eval(json_str) 
