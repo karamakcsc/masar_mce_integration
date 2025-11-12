@@ -491,6 +491,7 @@ def master_data_check_execute():
             data.get("market_id"),
             data.get("market_description"),
             data.get("pos_no"),
+            data.get("primary_key"),
             data.get("nielsen_code"),
             data.get("pos_profile"),
             data.get("posting_date"),
@@ -566,7 +567,7 @@ def insert_batches(parent_values, child_values):
             "POS Data Import",
             [
                 "name", "creation", "modified", "owner", "modified_by",
-                "docstatus", "status", "market_id", "market_description", "pos_no",
+                "docstatus", "status", "market_id", "market_description", "pos_no", "primary_key",
                 "nielsen_code", "pos_profile", "posting_date", "posting_time",
                 "total_quantity", "invoice_total", "billing_type",
                 "payment_method", "rejected_reason",
