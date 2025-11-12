@@ -598,7 +598,6 @@ def create_sales_invoice_from_data_import():
     value = create_sales_invoice_from_data_import_execute()
     return value
     
-    
 def create_sales_invoice_from_data_import_execute():
     pos_data_import = frappe.db.sql("""
         SELECT 
@@ -606,18 +605,41 @@ def create_sales_invoice_from_data_import_execute():
         FROM 
             `tabPOS Data Import` tpdi 
         WHERE 
-            tpdi.docstatus =0 
+            tpdi.docstatus = 0 
         ORDER BY 
-            tpdi.posting_date  , 
-            tpdi.posting_time 
-        """ , as_dict=True)
+            tpdi.posting_date, 
+            tpdi.posting_time
+    """, as_dict=True)
+
+    total_processed = 0
+    failed = []
+
     for record in pos_data_import:
-        pos_data_import_doc = frappe.get_doc("POS Data Import", record.name)
-        pos_data_import_doc.run_method("validate")
-        if pos_data_import_doc.status == "Master Data Checked":
-            pos_data_import_doc.run_method("submit")
-        else:
-            continue
-    total_processed = len(pos_data_import)
-    return {"status": "Sales Invoice Creation from POS Data Import Executed", "count": total_processed}
-    
+        try:
+            pos_data_import_doc = frappe.get_doc("POS Data Import", record.name)
+            pos_data_import_doc.run_method("validate")
+            if pos_data_import_doc.status == "Master Data Checked":
+                pos_data_import_doc.run_method("submit")
+            total_processed += 1
+
+        except Exception as e:
+            frappe.log_error(
+                message=f"POS Data Import {record.name} failed: {str(e)}",
+                title="POS Data Import Execution Error"
+            )
+            try:
+                doc = frappe.get_doc("POS Data Import", record.name)
+                doc.db_set("status", "Rejected")
+                doc.db_set("rejected_reason", str(e))
+            except Exception as inner_e:
+                frappe.log_error(f"Failed to set Rejected status for {record.name}: {inner_e}")
+
+            failed.append(record.name)
+            continue 
+    frappe.db.commit() 
+    return {
+        "status": "Sales Invoice Creation from POS Data Import Executed",
+        "processed": total_processed,
+        "failed": failed,
+        "count": len(pos_data_import)
+    }

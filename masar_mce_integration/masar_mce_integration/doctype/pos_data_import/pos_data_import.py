@@ -29,7 +29,7 @@ class POSDataImport(Document):
 			total_amount += flt(i.sales_price) * flt(i.quantity)
 		if total_qty != flt(self.total_quantity):
 			not_existing.append(f"Total Quantity mismatch: Expected {self.total_quantity}, Found {total_qty}.")
-		if total_amount != flt(self.invoice_total):
+		if abs(total_amount - flt(self.invoice_total)) > 0.01:
 			not_existing.append(f"Total Amount mismatch: Expected {self.invoice_total}, Found {total_amount}.")
 		if not_existing:
 			self.status = "Rejected"
