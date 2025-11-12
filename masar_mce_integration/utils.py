@@ -453,8 +453,8 @@ def master_data_check_execute():
         )
         SELECT 
             JSON_OBJECT(
-                'primary_key; , primary_key, 
-                'pos_no, pos_no , 
+                'primary_key' , primary_key, 
+                'pos_no', pos_no , 
                 'market_id', market_id,
                 'market_description', market_description,
                 'nielsen_code', nielsen_code,
