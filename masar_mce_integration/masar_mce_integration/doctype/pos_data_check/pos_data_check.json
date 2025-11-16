@@ -5,38 +5,68 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "market_id",
-  "market_description",
+  "api_ref",
   "status",
   "rejected_reason",
-  "column_break_zfqp",
-  "nielsen_code",
-  "day",
-  "date_timestamp",
+  "column_break_eqpg",
+  "invoice_pk",
+  "row_pk",
   "imported",
-  "primary_key",
-  "api_ref",
-  "section_break_pmqk",
-  "receipt_no",
-  "column_break_wtxu",
+  "section_break_hgli",
+  "market_id",
+  "market_description",
+  "idx",
+  "column_break_zfqp",
   "pos_no",
+  "receipt_no",
+  "current_year",
   "section_break_idgj",
   "item_code",
   "item_description",
   "barcode",
   "column_break_tepu",
-  "sales_price",
   "quantity",
+  "rate",
+  "amount",
+  "row_discount_value",
+  "section_break_ylcb",
+  "offers_id",
+  "refund_receipt_no",
+  "refund_receipt_pos_no",
+  "receipt_type",
+  "column_break_roja",
+  "cashier_no",
+  "cashier_name",
+  "date_timestamp",
+  "section_break_rqmn",
+  "customer_no",
+  "customer_ref",
+  "column_break_pnwc",
+  "customer_type",
+  "section_break_rbkr",
   "discount_percent",
   "discount_value",
-  "section_break_rbkr",
-  "invoice_total",
-  "total_price",
-  "date_description",
+  "payment_method",
   "column_break_epav",
   "total_quantity",
-  "billing_type",
-  "payment_method"
+  "total",
+  "net_value",
+  "section_break_guov",
+  "pay_value",
+  "pay_value_check_no",
+  "pay_visa_type",
+  "column_break_kkjd",
+  "pay_value_check",
+  "pay_value_visa",
+  "reminder_value",
+  "section_break_rmln",
+  "client_name",
+  "national_id",
+  "program_id",
+  "column_break_fwld",
+  "tid",
+  "rrn",
+  "auth"
  ],
  "fields": [
   {
@@ -54,32 +84,14 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "nielsen_code",
-   "fieldtype": "Data",
-   "label": "Nielsen Code"
-  },
-  {
-   "fieldname": "day",
-   "fieldtype": "Data",
-   "label": "Day"
-  },
-  {
    "fieldname": "date_timestamp",
    "fieldtype": "Data",
    "label": "Date Timestamp"
   },
   {
-   "fieldname": "section_break_pmqk",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "receipt_no",
    "fieldtype": "Data",
    "label": "Receipt No"
-  },
-  {
-   "fieldname": "column_break_wtxu",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "pos_no",
@@ -110,43 +122,13 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "sales_price",
-   "fieldtype": "Data",
-   "label": "Sales Price"
-  },
-  {
    "fieldname": "quantity",
    "fieldtype": "Data",
    "label": "Quantity"
   },
   {
-   "fieldname": "discount_percent",
-   "fieldtype": "Data",
-   "label": "Discount Percent"
-  },
-  {
-   "fieldname": "discount_value",
-   "fieldtype": "Data",
-   "label": "Discount Value"
-  },
-  {
    "fieldname": "section_break_rbkr",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "invoice_total",
-   "fieldtype": "Data",
-   "label": "Invoice Total"
-  },
-  {
-   "fieldname": "total_price",
-   "fieldtype": "Data",
-   "label": "Total Price"
-  },
-  {
-   "fieldname": "date_description",
-   "fieldtype": "Data",
-   "label": "Date Description"
   },
   {
    "fieldname": "column_break_epav",
@@ -156,16 +138,6 @@
    "fieldname": "total_quantity",
    "fieldtype": "Data",
    "label": "Total Quantity"
-  },
-  {
-   "fieldname": "billing_type",
-   "fieldtype": "Data",
-   "label": "Billing Type"
-  },
-  {
-   "fieldname": "payment_method",
-   "fieldtype": "Data",
-   "label": "Payment Method"
   },
   {
    "fieldname": "status",
@@ -193,15 +165,216 @@
    "options": "API Data Income"
   },
   {
-   "fieldname": "primary_key",
+   "fieldname": "column_break_eqpg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "invoice_pk",
    "fieldtype": "Data",
-   "label": "Primary Key"
+   "label": "Invoice PK"
+  },
+  {
+   "fieldname": "section_break_hgli",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "row_pk",
+   "fieldtype": "Data",
+   "label": "Row PK"
+  },
+  {
+   "fieldname": "idx",
+   "fieldtype": "Data",
+   "label": "Idx"
+  },
+  {
+   "fieldname": "current_year",
+   "fieldtype": "Data",
+   "label": "Current Year"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Data",
+   "label": "Rate"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Data",
+   "label": "Amount"
+  },
+  {
+   "fieldname": "row_discount_value",
+   "fieldtype": "Data",
+   "label": "Row Discount Value"
+  },
+  {
+   "fieldname": "section_break_ylcb",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "offers_id",
+   "fieldtype": "Data",
+   "label": "Offers ID"
+  },
+  {
+   "fieldname": "refund_receipt_no",
+   "fieldtype": "Data",
+   "label": "Refund Receipt No"
+  },
+  {
+   "fieldname": "refund_receipt_pos_no",
+   "fieldtype": "Data",
+   "label": "Refund Receipt POS No"
+  },
+  {
+   "default": "0",
+   "fieldname": "receipt_type",
+   "fieldtype": "Check",
+   "label": "Receipt Type"
+  },
+  {
+   "fieldname": "column_break_roja",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cashier_no",
+   "fieldtype": "Data",
+   "label": "Cashier No"
+  },
+  {
+   "fieldname": "cashier_name",
+   "fieldtype": "Data",
+   "label": "Cashier Name"
+  },
+  {
+   "fieldname": "section_break_rqmn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "customer_no",
+   "fieldtype": "Data",
+   "label": "Customer No"
+  },
+  {
+   "fieldname": "customer_ref",
+   "fieldtype": "Data",
+   "label": "Customer Ref"
+  },
+  {
+   "fieldname": "column_break_pnwc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_type",
+   "fieldtype": "Data",
+   "label": "Customer Type"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Data",
+   "label": "Total"
+  },
+  {
+   "fieldname": "discount_percent",
+   "fieldtype": "Data",
+   "label": "Discount Percent"
+  },
+  {
+   "fieldname": "discount_value",
+   "fieldtype": "Data",
+   "label": "Discount Value"
+  },
+  {
+   "fieldname": "net_value",
+   "fieldtype": "Data",
+   "label": "Net Value"
+  },
+  {
+   "fieldname": "section_break_guov",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "pay_value",
+   "fieldtype": "Data",
+   "label": "Pay Value"
+  },
+  {
+   "fieldname": "pay_value_check_no",
+   "fieldtype": "Data",
+   "label": "Pay Value Check No"
+  },
+  {
+   "fieldname": "pay_visa_type",
+   "fieldtype": "Data",
+   "label": "Pay VISA Type"
+  },
+  {
+   "fieldname": "column_break_kkjd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pay_value_check",
+   "fieldtype": "Data",
+   "label": "Pay Value Check"
+  },
+  {
+   "fieldname": "pay_value_visa",
+   "fieldtype": "Data",
+   "label": "Pay Value VISA"
+  },
+  {
+   "fieldname": "reminder_value",
+   "fieldtype": "Data",
+   "label": "Reminder Value"
+  },
+  {
+   "fieldname": "section_break_rmln",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "label": "Client Name"
+  },
+  {
+   "fieldname": "national_id",
+   "fieldtype": "Data",
+   "label": "National ID"
+  },
+  {
+   "fieldname": "program_id",
+   "fieldtype": "Data",
+   "label": "Program ID"
+  },
+  {
+   "fieldname": "column_break_fwld",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tid",
+   "fieldtype": "Data",
+   "label": "TID"
+  },
+  {
+   "fieldname": "rrn",
+   "fieldtype": "Data",
+   "label": "RRN"
+  },
+  {
+   "fieldname": "auth",
+   "fieldtype": "Data",
+   "label": "Auth"
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Data",
+   "label": "Payment Method"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-12 12:14:49.345458",
+ "modified": "2025-11-16 10:28:40.383554",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Check",

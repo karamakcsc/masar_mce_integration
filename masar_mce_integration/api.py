@@ -31,6 +31,7 @@ def pos_data_execution_wait_and_run():
             timeout=200000
         )
         return
+    time.sleep(120)
     frappe.enqueue(
         "masar_mce_integration.api.pos_data_execution_wait_and_run",
         queue='default',

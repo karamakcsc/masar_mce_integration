@@ -1,7 +1,7 @@
 # Copyright (c) 2025, KCSC and contributors
 # For license information, please see license.txt
 
-import frappe , json , ast
+import frappe  , ast
 from frappe.model.document import Document
 
 class APIDataIncome(Document):
@@ -19,5 +19,6 @@ class APIDataIncome(Document):
             data=records_list,
             api_doc= self.name,
             queue='long',
-            timeout=100000
+            timeout=100000,
+            is_async = False
         )

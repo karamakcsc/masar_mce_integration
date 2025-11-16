@@ -6,30 +6,60 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_imsg",
+  "invoice_pk",
+  "status",
+  "rejected_reason",
+  "amended_from",
+  "column_break_hrkw",
   "market_id",
   "market_description",
   "pos_no",
-  "primary_key",
-  "column_break_hrkw",
-  "amended_from",
-  "nielsen_code",
   "pos_profile",
+  "receipt_no",
   "section_break_czdj",
   "posting_date",
   "column_break_pkji",
   "posting_time",
+  "current_year",
   "section_break_cohv",
   "items",
   "section_break_szxk",
-  "total_quantity",
-  "billing_type",
-  "column_break_vuqn",
-  "invoice_total",
+  "discount_percent",
+  "discount_value",
   "payment_method",
-  "section_break_lukc",
-  "status",
-  "column_break_dmbj",
-  "rejected_reason"
+  "column_break_vuqn",
+  "total_quantity",
+  "total",
+  "net_value",
+  "tab_2_tab",
+  "section_break_ynfx",
+  "client_name",
+  "national_id",
+  "program_id",
+  "column_break_yepy",
+  "tid",
+  "rrn",
+  "auth",
+  "section_break_vpid",
+  "offers_id",
+  "refund_receipt_no",
+  "refund_receipt_pos_no",
+  "column_break_lmvw",
+  "cashier_no",
+  "cashier_name",
+  "section_break_abwn",
+  "customer_no",
+  "customer_ref",
+  "column_break_fpez",
+  "customer_type",
+  "tab_3_tab",
+  "pay_value",
+  "pay_value_visa",
+  "reminder_value",
+  "column_break_tswz",
+  "pay_value_check_no",
+  "pay_visa_type",
+  "pay_value_check"
  ],
  "fields": [
   {
@@ -59,11 +89,6 @@
   {
    "fieldname": "column_break_hrkw",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "nielsen_code",
-   "fieldtype": "Data",
-   "label": "Nielsen Code"
   },
   {
    "fieldname": "section_break_czdj",
@@ -112,32 +137,9 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "invoice_total",
-   "fieldtype": "Float",
-   "label": "Invoice Total"
-  },
-  {
-   "fieldname": "billing_type",
-   "fieldtype": "Data",
-   "label": "Billing Type"
-  },
-  {
-   "fieldname": "payment_method",
-   "fieldtype": "Data",
-   "label": "Payment Method"
-  },
-  {
-   "fieldname": "section_break_lukc",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "status",
    "fieldtype": "Data",
    "label": "Status"
-  },
-  {
-   "fieldname": "column_break_dmbj",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "rejected_reason",
@@ -150,16 +152,189 @@
    "label": "POS No"
   },
   {
-   "fieldname": "primary_key",
+   "fieldname": "invoice_pk",
    "fieldtype": "Data",
-   "label": "Primary Key"
+   "label": "Invoice pk"
+  },
+  {
+   "fieldname": "current_year",
+   "fieldtype": "Data",
+   "label": "Current Year"
+  },
+  {
+   "fieldname": "receipt_no",
+   "fieldtype": "Data",
+   "label": "Receipt No"
+  },
+  {
+   "fieldname": "section_break_ynfx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "label": "Client Name"
+  },
+  {
+   "fieldname": "national_id",
+   "fieldtype": "Data",
+   "label": "National ID"
+  },
+  {
+   "fieldname": "program_id",
+   "fieldtype": "Data",
+   "label": "Program ID"
+  },
+  {
+   "fieldname": "column_break_yepy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tid",
+   "fieldtype": "Data",
+   "label": "TID"
+  },
+  {
+   "fieldname": "rrn",
+   "fieldtype": "Data",
+   "label": "RRN"
+  },
+  {
+   "fieldname": "auth",
+   "fieldtype": "Data",
+   "label": "Auth"
+  },
+  {
+   "fieldname": "discount_percent",
+   "fieldtype": "Percent",
+   "label": "Discount Percent"
+  },
+  {
+   "fieldname": "discount_value",
+   "fieldtype": "Float",
+   "label": "Discount Value"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Float",
+   "label": "Total"
+  },
+  {
+   "fieldname": "net_value",
+   "fieldtype": "Float",
+   "label": "Net Value"
+  },
+  {
+   "fieldname": "tab_2_tab",
+   "fieldtype": "Tab Break",
+   "label": "Client and Customer"
+  },
+  {
+   "fieldname": "section_break_vpid",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "offers_id",
+   "fieldtype": "Data",
+   "label": "Offers ID"
+  },
+  {
+   "fieldname": "refund_receipt_no",
+   "fieldtype": "Data",
+   "label": "Refund Receipt No"
+  },
+  {
+   "fieldname": "refund_receipt_pos_no",
+   "fieldtype": "Data",
+   "label": "Refund Receipt POS No"
+  },
+  {
+   "fieldname": "column_break_lmvw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cashier_no",
+   "fieldtype": "Data",
+   "label": "Cashier No"
+  },
+  {
+   "fieldname": "cashier_name",
+   "fieldtype": "Data",
+   "label": "Cashier Name"
+  },
+  {
+   "fieldname": "section_break_abwn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "customer_no",
+   "fieldtype": "Data",
+   "label": "Customer No"
+  },
+  {
+   "fieldname": "customer_ref",
+   "fieldtype": "Data",
+   "label": "Customer Ref"
+  },
+  {
+   "fieldname": "column_break_fpez",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_type",
+   "fieldtype": "Data",
+   "label": "Customer Type"
+  },
+  {
+   "fieldname": "tab_3_tab",
+   "fieldtype": "Tab Break",
+   "label": "Pay Details"
+  },
+  {
+   "fieldname": "pay_value",
+   "fieldtype": "Float",
+   "label": "Pay Value"
+  },
+  {
+   "fieldname": "pay_value_visa",
+   "fieldtype": "Float",
+   "label": "Pay Value VISA"
+  },
+  {
+   "fieldname": "reminder_value",
+   "fieldtype": "Float",
+   "label": "Reminder Value"
+  },
+  {
+   "fieldname": "pay_value_check_no",
+   "fieldtype": "Data",
+   "label": "Pay Value Check No"
+  },
+  {
+   "fieldname": "pay_visa_type",
+   "fieldtype": "Data",
+   "label": "Pay VISA Type"
+  },
+  {
+   "fieldname": "pay_value_check",
+   "fieldtype": "Data",
+   "label": "Pay Value Check"
+  },
+  {
+   "fieldname": "column_break_tswz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Data",
+   "label": "Payment Method"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-12 12:15:59.776414",
+ "modified": "2025-11-16 10:31:18.153949",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Import",
