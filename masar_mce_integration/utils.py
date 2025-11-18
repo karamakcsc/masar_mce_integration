@@ -467,7 +467,7 @@ def master_data_check_execute():
             LEFT JOIN 
                 pos_profiles AS pro
             ON  
-                pro.pos_profile LIKE CONCAT('%' , r.market_id , '%')
+                pro.pos_profile LIKE CONCAT('%' , r.market_description , '%')
                 AND pro.pos_profile LIKE CONCAT( '%-' , r.pos_no )
             LEFT JOIN
                 payment_methods AS pm 
