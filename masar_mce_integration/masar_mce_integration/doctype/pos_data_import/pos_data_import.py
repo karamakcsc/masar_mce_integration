@@ -3,9 +3,9 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import flt, now
+from frappe.utils import flt
 from frappe import _
-
+from masar_mce_integration.utils import mark_pos_check_as_imported
 
 class POSDataImport(Document):
 	def validate(self):
@@ -16,7 +16,10 @@ class POSDataImport(Document):
 		self.check_existing_master_data()
 		self.check_available_quantity()
 		self.check_duplicate_invoice()
-
+		imported = list()
+		for i in self.items:
+			imported.append(i.pos_data_check)
+		mark_pos_check_as_imported(imported)			
 		if self.status != "Master Data Checked":
 			self.db_set("status", self.status)
 			self.db_set("rejected_reason", self.rejected_reason or _("Not Master Data Checked"))
