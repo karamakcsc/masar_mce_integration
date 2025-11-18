@@ -154,7 +154,8 @@ def data_quality_check_execute():
             program_id,
             tid,
             rrn,
-            auth
+            auth,
+            payment_method
         )
         SELECT
             LPAD(@base := @base + 1, 18, '0') AS name,
@@ -263,7 +264,8 @@ def data_quality_check_execute():
             tipd.program_id,
             tipd.tid,
             tipd.rrn,
-            tipd.auth
+            tipd.auth,
+            tipd.payment_method
         FROM `tabPOS Data Income` tipd
     """, (user_, user_))
 
