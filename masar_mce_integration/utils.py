@@ -467,7 +467,7 @@ def master_data_check_execute():
             LEFT JOIN 
                 pos_profiles AS pro
             ON  
-                pro.pos_profile LIKE CONCAT('%' , r.market_description , '%')
+                pro.pos_profile LIKE CONCAT('%' , r.market_id , '%')
                 AND pro.pos_profile LIKE CONCAT( '%-' , r.pos_no )
             LEFT JOIN
                 payment_methods AS pm 
@@ -624,12 +624,15 @@ def master_data_check_execute():
                 'reminder_value' , j.reminder_value , 
                 'items' , j.items , 
                 'status' , j.status , 
-                'Rejected_reason' , rejected_reason  
+                'Rejected_reason' , rejected_reason
+                
             ) as invoice
         FROM pos_invoice j
+
     """, as_dict=True)
     parent_values = []
     child_values = []
+    pos_check_names_to_update = set()
     batch_size = 5000
     total_processed = 0
     now_str = now()
@@ -637,6 +640,7 @@ def master_data_check_execute():
                 SELECT COALESCE(MAX(CAST(name AS UNSIGNED)), 0)
                 FROM `tabPOS Data Import`
             """)
+
     serial_number = int(serial_number_result[0][0]) + 1 if serial_number_result else 1
     for record in pos_invoice:
         data = loads(record.invoice)
@@ -684,8 +688,11 @@ def master_data_check_execute():
             data.get("pay_visa_type"),
             data.get("pay_value_check")
         ])
+    
         for idx, item in enumerate(data.get("items", []), start=1):
             pos_check_name = item.get("pos_data_check")
+            if pos_check_name:
+                pos_check_names_to_update.add(pos_check_name)
             child_values.append([
                 frappe.generate_hash(length=20),
                 now_str, now_str, frappe.session.user, frappe.session.user,
@@ -709,11 +716,17 @@ def master_data_check_execute():
 
         total_processed += 1
         if total_processed % batch_size == 0:
-            insert_batches(parent_values, child_values)      
+            insert_batches(parent_values, child_values)
+            if pos_check_names_to_update:
+                mark_pos_check_as_imported(pos_check_names_to_update)
+                pos_check_names_to_update.clear()          
             parent_values.clear()
             child_values.clear()   
     if parent_values:
         insert_batches(parent_values, child_values)
+        
+    if pos_check_names_to_update:
+        mark_pos_check_as_imported(pos_check_names_to_update)
     db.commit()
     frappe.flags.in_import = False
     frappe.flags.mute_emails = False
