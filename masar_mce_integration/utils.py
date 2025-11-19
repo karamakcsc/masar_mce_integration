@@ -378,7 +378,8 @@ def master_data_check_execute():
                 c.pay_value_check_no ,
                 c.pay_value_visa ,
                 c.pay_visa_type ,
-                c.reminder_value 
+                c.reminder_value  , 
+                c.receipt_type
             FROM 
                 `tabPOS Data Check`  AS c 
             LEFT JOIN 
@@ -425,6 +426,7 @@ def master_data_check_execute():
                 r.pay_value_visa ,
                 r.pay_visa_type ,
                 r.reminder_value , 
+                r.receipt_type ,
                 SUM(r.quantity ) AS sum_of_rows_quantity , 
                 SUM(r.amount ) AS sum_of_rows_total , 
                 MAX(r.total) AS total , 
@@ -516,6 +518,7 @@ def master_data_check_execute():
                 p.pay_value_visa ,
                 p.pay_visa_type ,
                 p.reminder_value , 
+                p.receipt_type ,
                 p.items , 
                 CASE 
                     WHEN p.row_status =  'Rejected' THEN 'Quality Rejected'
@@ -627,7 +630,8 @@ def master_data_check_execute():
                 'reminder_value' , j.reminder_value , 
                 'items' , j.items , 
                 'status' , j.status , 
-                'rejected_reason' , rejected_reason            
+                'rejected_reason' , j.rejected_reason    , 
+                'receipt_type' , j.receipt_type        
             ) as invoice
         FROM pos_invoice j
 
@@ -688,7 +692,8 @@ def master_data_check_execute():
             data.get("reminder_value"),
             data.get("pay_value_check_no"),
             data.get("pay_visa_type"),
-            data.get("pay_value_check")
+            data.get("pay_value_check"),
+            data.get('receipt_type')
         ])
     
         for idx, item in enumerate(data.get("items", []), start=1):
@@ -798,7 +803,8 @@ def insert_batches(parent_values, child_values):
                 "reminder_value", 
                 "pay_value_check_no",
                 "pay_visa_type", 
-                "pay_value_check"
+                "pay_value_check", 
+                "receipt_type"
             ],
             parent_values,
             ignore_duplicates=True,

@@ -16,6 +16,7 @@
   "pos_no",
   "pos_profile",
   "receipt_no",
+  "receipt_type",
   "section_break_czdj",
   "posting_date",
   "column_break_pkji",
@@ -328,13 +329,18 @@
    "fieldname": "payment_method",
    "fieldtype": "Data",
    "label": "Payment Method"
+  },
+  {
+   "fieldname": "receipt_type",
+   "fieldtype": "Data",
+   "label": "Receipt Type"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-16 10:31:18.153949",
+ "modified": "2025-11-19 17:01:33.964610",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Import",

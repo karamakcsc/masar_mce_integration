@@ -229,7 +229,7 @@
   {
    "default": "0",
    "fieldname": "receipt_type",
-   "fieldtype": "Check",
+   "fieldtype": "Data",
    "label": "Receipt Type"
   },
   {
@@ -374,7 +374,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-16 10:28:40.383554",
+ "modified": "2025-11-19 17:00:54.028148",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Check",
