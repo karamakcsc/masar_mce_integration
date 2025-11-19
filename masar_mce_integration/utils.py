@@ -7,7 +7,7 @@ import pandas as pd
 def bulk_insert_pos_data(data, api_doc, batch_size=10000):
     db.sql("""
         DELETE FROM `tabPOS Data Income`
-        WHERE status = 'LOADED'
+        WHERE status IN ('LOADED' , 'DUPLICATE' )
     """)
     db.commit()
     if not data:
@@ -44,12 +44,12 @@ def bulk_insert_pos_data(data, api_doc, batch_size=10000):
         )[0][0]
         serial_number = int(serial_number or 0) + 1
 
-        new_df["name"] = range(serial_number, serial_number + len(new_df))
-        new_df["creation"] = now_str
-        new_df["modified"] = now_str
-        new_df["owner"] = frappe.session.user
-        new_df["modified_by"] = frappe.session.user
-        new_df["api_ref"] = api_doc
+        df["name"] = range(serial_number, serial_number + len(df))
+        df["creation"] = now_str
+        df["modified"] = now_str
+        df["owner"] = frappe.session.user
+        df["modified_by"] = frappe.session.user
+        df["api_ref"] = api_doc
     insert_fields = ['market_id', 'market_description', 'pos_no', 'current_year',
        'receipt_no', 'idx', 'item_code', 'item_description', 'quantity',
        'rate', 'amount', 'row_discount_value', 'barcode', 'offers_id',
@@ -63,14 +63,14 @@ def bulk_insert_pos_data(data, api_doc, batch_size=10000):
        'modified', 'owner', 'modified_by', 'api_ref']
 
     for field in insert_fields:
-        if field not in new_df.columns:
-            new_df[field] = None
+        if field not in df.columns:
+            df[field] = None
 
     placeholders = "(" + ",".join(["%s"] * len(insert_fields)) + ")"
-    total_rows = len(new_df)
+    total_rows = len(df)
 
     for i in range(0, total_rows, batch_size):
-        batch_df = new_df.iloc[i:i + batch_size]
+        batch_df = df.iloc[i:i + batch_size]
         values = [
             tuple(batch_df[field].iloc[j] for field in insert_fields)
             for j in range(len(batch_df))
@@ -164,7 +164,8 @@ def data_quality_check_execute():
             %s AS modified_by,
             %s AS owner,
             tipd.api_ref,
-            CASE 
+            CASE
+                WHEN tipd.status = 'DUPLICATE' THEN 'DUPLICATE'
                 WHEN 
                     (
                         NULLIF(tipd.date_timestamp, '') IS NOT NULL
@@ -221,7 +222,8 @@ def data_quality_check_execute():
                 IF(tipd.total NOT REGEXP '^-?[0-9]+(\\.[0-9]+)?$', 'Invalid Total', NULL),
                 IF(tipd.net_value NOT REGEXP '^-?[0-9]+(\\.[0-9]+)?$', 'Invalid Net Value', NULL),
                 IF(tipd.reminder_value NOT REGEXP '^-?[0-9]+(\\.[0-9]+)?$', 'Invalid Reminder Value', NULL),
-                IF(tipd.pay_value NOT REGEXP '^-?[0-9]+(\\.[0-9]+)?$', 'Invalid Pay Value', NULL)
+                IF(tipd.pay_value NOT REGEXP '^-?[0-9]+(\\.[0-9]+)?$', 'Invalid Pay Value', NULL),
+                IF(tipd.status = 'DUPLICATE' , 'DUPLICATE Invoice' , NULL )
             ) AS rejected_reason,
             tipd.invoice_pk,
             tipd.row_pk,
@@ -299,7 +301,6 @@ def master_data_check_execute():
     frappe.flags.in_import = True
     frappe.flags.mute_emails = True
     frappe.flags.in_migrate = True
-    start_time = time.time()
     pos_invoice = db.sql(""" 
         WITH items  AS (
             SELECT 
@@ -576,7 +577,7 @@ def master_data_check_execute():
                                 END,
                                 CASE 
                                     WHEN 
-                                        COALESCE(p.total_quantity , 0 ) <> COALESCE(p.sum_of_rows_quantity , 0 )
+                                        ABS(COALESCE(p.total_quantity , 0 ) - COALESCE(p.sum_of_rows_quantity , 0 )) 0.01
                                     THEN 
                                         CONCAT('Quantity mismatch: ', p.total_quantity, ' vs ', (p.sum_of_rows_quantity))
                                     ELSE 
@@ -626,8 +627,7 @@ def master_data_check_execute():
                 'reminder_value' , j.reminder_value , 
                 'items' , j.items , 
                 'status' , j.status , 
-                'Rejected_reason' , rejected_reason
-                
+                'rejected_reason' , rejected_reason            
             ) as invoice
         FROM pos_invoice j
 
