@@ -577,7 +577,7 @@ def master_data_check_execute():
                                 END,
                                 CASE 
                                     WHEN 
-                                        ABS(COALESCE(p.total_quantity , 0 ) - COALESCE(p.sum_of_rows_quantity , 0 )) 0.01
+                                        ABS(COALESCE(p.total_quantity , 0 ) - COALESCE(p.sum_of_rows_quantity , 0 ))  > 0.01
                                     THEN 
                                         CONCAT('Quantity mismatch: ', p.total_quantity, ' vs ', (p.sum_of_rows_quantity))
                                     ELSE 
