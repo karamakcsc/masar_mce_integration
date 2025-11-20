@@ -229,9 +229,8 @@ class POSDataImport(Document):
                 "discount_percentage": flt(discount_pct),
             })
         payment_amount = flt(
-            getattr(self, "pay_value", None)
-            or getattr(self, "pay_value_visa", None)
-            or 0.0
+            getattr(self, "net_value", None)
+            or 0
         )
         if not payment_amount:
             pass
