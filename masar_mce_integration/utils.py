@@ -9,7 +9,6 @@ def bulk_insert_pos_data(data, api_doc, batch_size=10000):
         DELETE FROM `tabPOS Data Income`
         WHERE status IN ('LOADED' , 'DUPLICATE' )
     """)
-    db.commit()
     if not data:
         return {"status": "No data to insert", "count": 0}
 
@@ -80,7 +79,7 @@ def bulk_insert_pos_data(data, api_doc, batch_size=10000):
             ({", ".join(insert_fields)})
             VALUES {", ".join([placeholders] * len(values))}
         """, [v for row in values for v in row])
-        db.commit()
+    db.commit()
     db.set_value("API Data Income", api_doc, "status", "COMPLETED")
     db.set_value("API Data Income", api_doc, "new_count", new_count)
     db.set_value("API Data Income", api_doc, "duplicate_count", duplicate_count)
@@ -846,10 +845,10 @@ def create_sales_invoice_from_data_import():
     no_of_rows = db.sql("SELECT IFNULL(COUNT(*), 0) FROM `tabPOS Data Import` WHERE  docstatus = 0")[0][0]
     if no_of_rows == 0:
         return {"status": "No Data in POS Data Import With Master Data Checked Status", "count": no_of_rows}
-    value = create_sales_invoice_from_data_import_execute()
+    value = create_sales_invoice_from_data_import_execute(100)
     return value
     
-def create_sales_invoice_from_data_import_execute():
+def create_sales_invoice_from_data_import_execute(commit_interval=20):
     pos_data_import = frappe.db.sql("""
         SELECT 
             name
@@ -864,6 +863,7 @@ def create_sales_invoice_from_data_import_execute():
 
     total_processed = 0
     failed = []
+    processed_since_commit = 0
 
     for record in pos_data_import:
         try:
@@ -872,25 +872,36 @@ def create_sales_invoice_from_data_import_execute():
             if pos_data_import_doc.status == "Master Data Checked":
                 pos_data_import_doc.run_method("submit")
             total_processed += 1
-
+            processed_since_commit += 1
         except Exception as e:
             frappe.log_error(
                 message=f"POS Data Import {record.name} failed: {str(e)}",
                 title="POS Data Import Execution Error"
             )
             try:
-                doc = frappe.get_doc("POS Data Import", record.name)
-                doc.db_set("status", "Rejected")
-                doc.db_set("rejected_reason", str(e))
+                frappe.db.set_value(
+                    "POS Data Import",
+                    record.name,
+                    {
+                        "status": "Rejected",
+                        "rejected_reason": str(e),
+                    },
+                    update_modified=False,
+                )
             except Exception as inner_e:
-                frappe.log_error(f"Failed to set Rejected status for {record.name}: {inner_e}")
+                frappe.log_error(
+                    f"Failed to set Rejected status for {record.name}: {inner_e}"
+                )
 
             failed.append(record.name)
-            continue 
-    frappe.db.commit() 
+            processed_since_commit += 1
+        if processed_since_commit >= commit_interval:
+            frappe.db.commit()
+            processed_since_commit = 0
+    frappe.db.commit()
     return {
         "status": "Sales Invoice Creation from POS Data Import Executed",
         "processed": total_processed,
         "failed": failed,
-        "count": len(pos_data_import)
+        "count": len(pos_data_import),
     }

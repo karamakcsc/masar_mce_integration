@@ -45,6 +45,8 @@ def pos_data_execution_wait_and_run():
 
 def pos_data_execution_enq():
     check_quality_incoming_data()
-    master_data_check() 
+    frappe.db.commit()
+    master_data_check()
+    frappe.db.commit()
     create_sales_invoice_from_data_import()
     
