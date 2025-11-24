@@ -279,6 +279,7 @@ class POSDataImport(Document):
             "tid": "custom_tid",
             "rrn": "custom_rrn",
             "auth": "custom_auth",
+            "pos_no" : "custom_pos_no",
             "offers_id": "custom_offers_id",
             "refund_receipt_no": "custom_refund_receipt_no",
             "refund_receipt_pos_no": "custom_refund_receipt_pos_no",
