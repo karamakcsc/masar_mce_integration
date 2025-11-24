@@ -849,59 +849,62 @@ def create_sales_invoice_from_data_import():
     return value
     
 def create_sales_invoice_from_data_import_execute(commit_interval=20):
-    pos_data_import = frappe.db.sql("""
-        SELECT 
-            name
-        FROM 
-            `tabPOS Data Import` tpdi 
-        WHERE 
-            tpdi.docstatus = 0 
-        ORDER BY 
-            tpdi.posting_date, 
-            tpdi.posting_time
-    """, as_dict=True)
+    receipt_type = [1, 2]
+    for r in receipt_type:
+        pos_data_import = frappe.db.sql(f"""
+            SELECT 
+                name
+            FROM 
+                `tabPOS Data Import` tpdi 
+            WHERE 
+                tpdi.docstatus = 0 
+                AND tpdi.receipt_type = '{r}'
+            ORDER BY 
+                tpdi.posting_date, 
+                tpdi.posting_time
+        """, as_dict=True)
 
-    total_processed = 0
-    failed = []
-    processed_since_commit = 0
+        total_processed = 0
+        failed = []
+        processed_since_commit = 0
 
-    for record in pos_data_import:
-        try:
-            pos_data_import_doc = frappe.get_doc("POS Data Import", record.name)
-            pos_data_import_doc.run_method("validate")
-            if pos_data_import_doc.status == "Master Data Checked":
-                pos_data_import_doc.run_method("submit")
-            total_processed += 1
-            processed_since_commit += 1
-        except Exception as e:
-            frappe.log_error(
-                message=f"POS Data Import {record.name} failed: {str(e)}",
-                title="POS Data Import Execution Error"
-            )
+        for record in pos_data_import:
             try:
-                frappe.db.set_value(
-                    "POS Data Import",
-                    record.name,
-                    {
-                        "status": "Rejected",
-                        "rejected_reason": str(e),
-                    },
-                    update_modified=False,
-                )
-            except Exception as inner_e:
+                pos_data_import_doc = frappe.get_doc("POS Data Import", record.name)
+                pos_data_import_doc.run_method("validate")
+                if pos_data_import_doc.status == "Master Data Checked":
+                    pos_data_import_doc.run_method("submit")
+                total_processed += 1
+                processed_since_commit += 1
+            except Exception as e:
                 frappe.log_error(
-                    f"Failed to set Rejected status for {record.name}: {inner_e}"
+                    message=f"POS Data Import {record.name} failed: {str(e)}",
+                    title="POS Data Import Execution Error"
                 )
+                try:
+                    frappe.db.set_value(
+                        "POS Data Import",
+                        record.name,
+                        {
+                            "status": "Rejected",
+                            "rejected_reason": str(e),
+                        },
+                        update_modified=False,
+                    )
+                except Exception as inner_e:
+                    frappe.log_error(
+                        f"Failed to set Rejected status for {record.name}: {inner_e}"
+                    )
 
-            failed.append(record.name)
-            processed_since_commit += 1
-        if processed_since_commit >= commit_interval:
-            frappe.db.commit()
-            processed_since_commit = 0
-    frappe.db.commit()
-    return {
-        "status": "Sales Invoice Creation from POS Data Import Executed",
-        "processed": total_processed,
-        "failed": failed,
-        "count": len(pos_data_import),
-    }
+                failed.append(record.name)
+                processed_since_commit += 1
+            if processed_since_commit >= commit_interval:
+                frappe.db.commit()
+                processed_since_commit = 0
+        frappe.db.commit()
+        return {
+            "status": "Sales Invoice Creation from POS Data Import Executed",
+            "processed": total_processed,
+            "failed": failed,
+            "count": len(pos_data_import),
+        }

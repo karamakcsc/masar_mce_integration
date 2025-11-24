@@ -245,20 +245,22 @@ fixtures = [
     {"dt": "Custom Field", "filters": [
         [
             "dt", "in", [
-                'Sales Invoice'
+                'Sales Invoice', 
+                'Sales Invoice Item'
             ]
         ]
     ]},
     {
-        "doctype": "Property Setter",
-        "filters": [
-            [
-                "doc_type",
-                "in",
-                [
-                    'Sales Invoice'
-                ]
-            ]
+    "doctype": "Property Setter",
+    "filters": [
+        [
+            "doc_type",
+            "in",
+        [
+            'Sales Invoice', 
+            'Sales Invoice Item'
+        ]
+        ]
         ]
     }
 ]
