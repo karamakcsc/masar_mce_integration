@@ -3,6 +3,7 @@ from frappe.utils import now
 from json import loads
 import frappe ,  time
 import pandas as pd
+from re import sub
 
 def bulk_insert_pos_data(data, api_doc, batch_size=10000):
     db.sql("""
@@ -301,7 +302,7 @@ def master_data_check_execute():
     frappe.flags.mute_emails = True
     frappe.flags.in_migrate = True
     pos_invoice = db.sql(""" 
-        WITH items  AS (
+                WITH items  AS (
             SELECT 
                 name as item_code
             FROM 
@@ -449,21 +450,21 @@ def master_data_check_execute():
                 MAX(CASE WHEN pm.payment_method IS NOT NULL THEN 1 ELSE 0 END) AS payment_method_exists , 
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
-                        'item_code' , r.item_code , 
-                        'barcode' , r.barcode , 
-                        'item_description' , r.item_description , 
-                        'quantity' , r.quantity , 
-                        'rate' , r.rate , 
-                        'amount' , r.amount , 
-                        'discount_value' , r.row_discount_value , 
-                        'status' , r.row_status , 
-                        'pos_data_check' , r.pos_data_check , 
-                        'api_ref' , r.api_ref , 
-                        'pos_data_check_status' , r.pos_data_check_status , 
-                        'pos_data_check_rejected_reason' , r.pos_data_check_rejected_reason , 
-                        'rejected_reason' , r.row_rejected_reason , 
-                        'invoice_pk' , r.invoice_pk , 
-                        'row_pk' , r.row_pk
+                        'item_code' , JSON_QUOTE(r.item_code) , 
+                        'barcode' , JSON_QUOTE(r.barcode) , 
+                        'item_description' , JSON_QUOTE(r.item_description) , 
+                        'quantity' , JSON_QUOTE(r.quantity) , 
+                        'rate' , JSON_QUOTE(r.rate) , 
+                        'amount' , JSON_QUOTE(r.amount) , 
+                        'discount_value' , JSON_QUOTE(r.row_discount_value) , 
+                        'status' , JSON_QUOTE(r.row_status) , 
+                        'pos_data_check' , JSON_QUOTE(r.pos_data_check) , 
+                        'api_ref' , JSON_QUOTE(r.api_ref) , 
+                        'pos_data_check_status' , JSON_QUOTE(r.pos_data_check_status) , 
+                        'pos_data_check_rejected_reason' , JSON_QUOTE(r.pos_data_check_rejected_reason) , 
+                        'rejected_reason' , JSON_QUOTE(r.row_rejected_reason) , 
+                        'invoice_pk' , JSON_QUOTE(r.invoice_pk) , 
+                        'row_pk' , JSON_QUOTE(r.row_pk)
                     )
                 ) AS items
             FROM 
@@ -592,48 +593,47 @@ def master_data_check_execute():
                 pos_invoice_collecting p
         )
         SELECT JSON_OBJECT(
-                'invoice_pk' , j.invoice_pk , 
-                'market_id' , j.market_id , 
-                'market_description' , j.market_description , 
-                'pos_no' , j.pos_no , 
-                'receipt_no' , j.receipt_no , 
-                'pos_profile' , j.pos_profile , 
-                'posting_date' , j.posting_date , 
-                'posting_time' , j.posting_time , 
-                'current_year' , j.current_year , 
-                'discount_percent' , j.discount_percent, 
-                'discount_value' , j.discount_value , 
-                'payment_method' , j.payment_method , 
-                'total' , j.total , 
-                'total_quantity' , j.total_quantity , 
-                'net_value' , j.net_value , 
-                'client_name' , j.client_name , 
-                'national_id' , j.national_id , 
-                'program_id' , j.program_id , 
-                'tid' , j.tid , 
-                'rrn' , j.rrn ,
-                'auth' , j.auth , 
-                'offers_id' , j.offers_id , 
-                'refund_receipt_no' , j.refund_receipt_no , 
-                'refund_receipt_pos_no'  , j.refund_receipt_pos_no , 
-                'cashier_no' , j.cashier_no , 
-                'cashier_name' , j.cashier_name , 
-                'customer_no' , j.customer_no , 
-                'customer_ref' , j.customer_ref , 
-                'customer_type' , j.customer_type , 
-                'pay_value' , j.pay_value, 
-                'pay_value_check' , j.pay_value_check , 
-                'pay_value_check_no' , j.pay_value_check_no , 
-                'pay_value_visa' , j.pay_value_visa , 
-                'pay_visa_type' , j.pay_visa_type , 
-                'reminder_value' , j.reminder_value , 
+                'invoice_pk' , JSON_QUOTE(j.invoice_pk) , 
+                'market_id' , JSON_QUOTE(j.market_id) , 
+                'market_description' , JSON_QUOTE(j.market_description) , 
+                'pos_no' , JSON_QUOTE(j.pos_no) , 
+                'receipt_no' , JSON_QUOTE(j.receipt_no) , 
+                'pos_profile' , JSON_QUOTE(j.pos_profile) , 
+                'posting_date' , JSON_QUOTE(j.posting_date) , 
+                'posting_time' , JSON_QUOTE(j.posting_time) , 
+                'current_year' , JSON_QUOTE(j.current_year) , 
+                'discount_percent' , JSON_QUOTE(j.discount_percent), 
+                'discount_value' , JSON_QUOTE(j.discount_value) , 
+                'payment_method' , JSON_QUOTE(j.payment_method) , 
+                'total' , JSON_QUOTE(j.total) , 
+                'total_quantity' , JSON_QUOTE(j.total_quantity) , 
+                'net_value' , JSON_QUOTE(j.net_value) , 
+                'client_name' , JSON_QUOTE(j.client_name) , 
+                'national_id' , JSON_QUOTE(j.national_id) , 
+                'program_id' , JSON_QUOTE(j.program_id) , 
+                'tid' , JSON_QUOTE(j.tid) , 
+                'rrn' , JSON_QUOTE(j.rrn) ,
+                'auth' , JSON_QUOTE(j.auth) , 
+                'offers_id' , JSON_QUOTE(j.offers_id) , 
+                'refund_receipt_no' , JSON_QUOTE(j.refund_receipt_no) , 
+                'refund_receipt_pos_no'  , JSON_QUOTE(j.refund_receipt_pos_no) , 
+                'cashier_no' , JSON_QUOTE(j.cashier_no) , 
+                'cashier_name' , JSON_QUOTE(j.cashier_name) , 
+                'customer_no' , JSON_QUOTE(j.customer_no) , 
+                'customer_ref' , JSON_QUOTE(j.customer_ref) , 
+                'customer_type' , JSON_QUOTE(j.customer_type) , 
+                'pay_value' , JSON_QUOTE(j.pay_value), 
+                'pay_value_check' , JSON_QUOTE(j.pay_value_check) , 
+                'pay_value_check_no' , JSON_QUOTE(j.pay_value_check_no) , 
+                'pay_value_visa' , JSON_QUOTE(j.pay_value_visa) , 
+                'pay_visa_type' , JSON_QUOTE(j.pay_visa_type) , 
+                'reminder_value' , JSON_QUOTE(j.reminder_value) , 
                 'items' , j.items , 
-                'status' , j.status , 
-                'rejected_reason' , j.rejected_reason    , 
-                'receipt_type' , j.receipt_type        
+                'status' , JSON_QUOTE(j.status) , 
+                'rejected_reason' , JSON_QUOTE(j.rejected_reason)    , 
+                'receipt_type' , JSON_QUOTE(j.receipt_type)       
             ) as invoice
         FROM pos_invoice j
-
     """, as_dict=True)
     parent_values = []
     child_values = []
@@ -648,7 +648,8 @@ def master_data_check_execute():
 
     serial_number = int(serial_number_result[0][0]) + 1 if serial_number_result else 1
     for record in pos_invoice:
-        data = loads(record.invoice)
+        raw = record.invoice
+        data = safe_json_loads(raw)
         parent_name = f"{serial_number:018d}"
         serial_number += 1
         parent_values.append([
@@ -738,6 +739,19 @@ def master_data_check_execute():
     frappe.flags.mute_emails = False
     frappe.flags.in_migrate = False 
     return {"status": "Master Data Check Executed", "count": total_processed}
+
+def safe_json_loads(raw):
+    if raw is None:
+        return None
+    raw = sub(r'[\x00-\x1F\x7F]', '', raw)
+    raw = raw.replace('\\', '\\\\')
+    raw = raw.replace('"', '\\"')
+    raw = raw.replace('\n', '\\n').replace('\r', '\\r').replace('\t', '\\t')
+    raw = raw.replace("\\'", "'")
+    raw = raw.strip()
+    return loads(raw)
+
+
 def mark_pos_check_as_imported(pos_check_names):
     if not pos_check_names:
         return
