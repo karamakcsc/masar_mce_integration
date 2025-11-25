@@ -1,9 +1,11 @@
 from frappe import db , _ 
 from frappe.utils import now
-from json import loads
+from json import loads , JSONDecodeError
 import frappe ,  time
 import pandas as pd
 from re import sub
+from typing import Any, Union
+from ast import literal_eval
 
 def bulk_insert_pos_data(data, api_doc, batch_size=10000):
     db.sql("""
@@ -740,16 +742,82 @@ def master_data_check_execute():
     frappe.flags.in_migrate = False 
     return {"status": "Master Data Check Executed", "count": total_processed}
 
-def safe_json_loads(raw):
+
+def safe_json_loads(raw: Any) -> Union[dict, list, None]:
     if raw is None:
         return None
-    raw = sub(r'[\x00-\x1F\x7F]', '', raw)
-    raw = raw.replace('\\', '\\\\')
-    raw = raw.replace('"', '\\"')
-    raw = raw.replace('\n', '\\n').replace('\r', '\\r').replace('\t', '\\t')
-    raw = raw.replace("\\'", "'")
+    
+    if isinstance(raw, (dict, list)):
+        return raw 
+    if isinstance(raw, bytes):
+        try:
+            raw = raw.decode('utf-8')
+        except UnicodeDecodeError:
+            try:
+                raw = raw.decode('latin-1')
+            except UnicodeDecodeError:
+                return None  
+    if not isinstance(raw, str):
+        try:
+            raw = str(raw)
+        except:
+            return None   
     raw = raw.strip()
-    return loads(raw)
+    
+    if not raw:
+        return None
+    raw = sub(r'^\ufeff', '', raw) 
+    raw = sub(r'^\ufffe', '', raw) 
+    try:
+        return loads(raw)
+    except JSONDecodeError:
+        pass
+    try:
+        fixed = sub(r"(?<=\{|\,|\:|\[)\s*'|'\s*(?=\]|\}|\:|\|,)", '"', raw)
+        fixed = sub(r"(?<!\\)'", '"', fixed) 
+        return loads(fixed)
+    except:
+        pass
+    try:
+        result = literal_eval(raw)
+        if isinstance(result, (dict, list)):
+            return result
+    except:
+        pass
+    try:
+        fixed = sub(r'(\w+)\s*:', r'"\1":', raw)
+        fixed = sub(r':\s*([^"\'\d\[\]{},\s]+)', r': "\1"', fixed)
+        return loads(fixed)
+    except:
+        pass 
+    try:
+        start_idx = min(
+            raw.find('{') if '{' in raw else len(raw),
+            raw.find('[') if '[' in raw else len(raw)
+        )
+        if start_idx < len(raw):
+            bracket_stack = []
+            end_idx = start_idx    
+            for i in range(start_idx, len(raw)):
+                char = raw[i]
+                if char in '{[':
+                    bracket_stack.append(char)
+                elif char in '}]':
+                    if bracket_stack and (
+                        (char == '}' and bracket_stack[-1] == '{') or
+                        (char == ']' and bracket_stack[-1] == '[')
+                    ):
+                        bracket_stack.pop()
+                
+                if not bracket_stack:
+                    end_idx = i + 1
+                    break
+            
+            partial_json = raw[start_idx:end_idx]
+            return loads(partial_json)
+    except:
+        pass 
+    return None
 
 
 def mark_pos_check_as_imported(pos_check_names):
