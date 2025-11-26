@@ -40,7 +40,6 @@ class POSDataImport(Document):
             return False       
         return_receipt_indicators = [
             "2", 
-            2 ,
             "مرتجع", 
             "return",  
             "refund"   
