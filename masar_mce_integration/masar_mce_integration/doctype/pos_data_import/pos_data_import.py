@@ -242,6 +242,7 @@ class POSDataImport(Document):
         return_invoice.return_against = original_invoice.name
         return_invoice.pos_profile = self.pos_profile
         return_invoice.set_posting_time = 1
+        return_invoice.disable_rounded_total = 1
         if getattr(self, "posting_date", None):
             return_invoice.posting_date = self.posting_date
         if getattr(self, "posting_time", None):
@@ -381,6 +382,7 @@ class POSDataImport(Document):
         si.is_pos = 1
         si.pos_profile = self.pos_profile
         si.set_posting_time = 1
+        si.disable_rounded_total = 1
         if getattr(self, "posting_date", None):
             si.posting_date = self.posting_date
         if getattr(self, "posting_time", None):
