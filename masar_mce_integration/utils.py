@@ -990,3 +990,10 @@ def create_sales_invoice_from_data_import_execute(commit_interval=20):
             "failed": failed,
             "count": len(pos_data_import),
         }
+        
+        
+        
+        
+        
+        
+#########################################3 

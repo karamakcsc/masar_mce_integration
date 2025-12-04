@@ -147,7 +147,7 @@
    "fieldname": "api_ref",
    "fieldtype": "Link",
    "label": "API Data Income",
-   "options": "API Data Income"
+   "options": "Active File Income"
   },
   {
    "fieldname": "column_break_tqso",
@@ -363,7 +363,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-19 17:00:28.400072",
+ "modified": "2025-12-03 15:49:48.168260",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Income",

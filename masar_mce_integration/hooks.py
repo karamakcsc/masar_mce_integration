@@ -149,21 +149,21 @@ doc_events = {
 # ---------------
 
 # scheduler_events = {
-# 	"all": [
-# 		"masar_mce_integration.tasks.all"
-# 	],
-# 	"daily": [
-# 		"masar_mce_integration.tasks.daily"
-# 	],
+# # 	"all": [
+# # 		"masar_mce_integration.tasks.all"
+# # 	],
+# # 	"daily": [
+# # 		"masar_mce_integration.tasks.daily"
+# # 	],
 # 	"hourly": [
-# 		"masar_mce_integration.tasks.hourly"
+# 		"masar_mce_integration.tasks.check_active_paths"
 # 	],
-# 	"weekly": [
-# 		"masar_mce_integration.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"masar_mce_integration.tasks.monthly"
-# 	],
+# # 	"weekly": [
+# # 		"masar_mce_integration.tasks.weekly"
+# # 	],
+# # 	"monthly": [
+# # 		"masar_mce_integration.tasks.monthly"
+# # 	],
 # }
 
 # Testing

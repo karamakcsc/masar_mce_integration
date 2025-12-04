@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestAPIDataIncome(FrappeTestCase):
+class TestActiveFileIncome(FrappeTestCase):
 	pass

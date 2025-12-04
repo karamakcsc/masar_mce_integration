@@ -8,14 +8,19 @@
   "section_break_nkaf",
   "posting_date",
   "posting_time",
-  "batch_size",
+  "amended_from",
   "column_break_oowt",
   "status",
-  "amended_from",
-  "new_count",
-  "duplicate_count",
+  "batch_size",
+  "status_description",
   "section_break_fszq",
-  "json"
+  "file_path",
+  "file_name",
+  "column_break_dubo",
+  "start_time",
+  "end_time",
+  "tab_2_tab",
+  "split_files"
  ],
  "fields": [
   {
@@ -27,7 +32,7 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "API Data Income",
+   "options": "Active File Income",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
@@ -41,16 +46,11 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "json",
-   "fieldtype": "Long Text",
-   "label": "Json"
-  },
-  {
-   "default": "QUEUE",
+   "default": "Reading",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "QUEUE\nCOMPLETED"
+   "options": "Reading\nProcessing\nComplete\nFailed"
   },
   {
    "default": "Today",
@@ -70,24 +70,56 @@
    "label": "Posting Time"
   },
   {
-   "fieldname": "new_count",
-   "fieldtype": "Int",
-   "label": "New Count"
+   "fieldname": "status_description",
+   "fieldtype": "Small Text",
+   "label": "Status Description"
   },
   {
-   "fieldname": "duplicate_count",
-   "fieldtype": "Int",
-   "label": "Duplicate Count"
+   "fieldname": "file_path",
+   "fieldtype": "Data",
+   "label": "File Path"
+  },
+  {
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "label": "File Name"
+  },
+  {
+   "fieldname": "column_break_dubo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Now",
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time"
+  },
+  {
+   "default": "Now",
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time"
+  },
+  {
+   "fieldname": "tab_2_tab",
+   "fieldtype": "Tab Break",
+   "label": "Split Files"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "split_files",
+   "fieldtype": "Table",
+   "options": "Split File Details"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-12 12:29:37.864720",
+ "modified": "2025-12-03 17:52:09.286536",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
- "name": "API Data Income",
+ "name": "Active File Income",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
