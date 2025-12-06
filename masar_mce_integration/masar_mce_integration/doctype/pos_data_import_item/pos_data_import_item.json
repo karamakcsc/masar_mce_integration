@@ -18,10 +18,8 @@
   "discount_value",
   "section_break_wjqv",
   "status",
-  "pos_data_check",
-  "api_ref",
-  "pos_data_check_status",
-  "pos_data_check_rejected_reason",
+  "active_file_income",
+  "split_file",
   "column_break_bfpy",
   "rejected_reason",
   "invoice_pk",
@@ -92,13 +90,6 @@
    "label": "Rejected Reason"
   },
   {
-   "fieldname": "pos_data_check",
-   "fieldtype": "Link",
-   "label": "POS Data Check",
-   "options": "POS Data Check",
-   "read_only": 1
-  },
-  {
    "fieldname": "rate",
    "fieldtype": "Float",
    "label": "Rate"
@@ -119,31 +110,23 @@
    "label": "Row PK"
   },
   {
-   "fieldname": "api_ref",
+   "fieldname": "active_file_income",
    "fieldtype": "Link",
-   "label": "API Data Income",
+   "label": "Active File Income",
    "options": "Active File Income"
   },
   {
-   "fetch_from": "pos_data_check.status",
-   "fieldname": "pos_data_check_status",
-   "fieldtype": "Data",
-   "label": "POS Data Check Status",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "pos_data_check.rejected_reason",
-   "fieldname": "pos_data_check_rejected_reason",
-   "fieldtype": "Small Text",
-   "label": "POS Data Check Rejected Reason",
-   "read_only": 1
+   "fieldname": "split_file",
+   "fieldtype": "Link",
+   "label": "Split File",
+   "options": "Split File"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-03 15:49:47.897054",
+ "modified": "2025-12-04 14:45:56.614707",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Import Item",

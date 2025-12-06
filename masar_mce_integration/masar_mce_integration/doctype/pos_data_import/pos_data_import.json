@@ -10,6 +10,8 @@
   "status",
   "rejected_reason",
   "amended_from",
+  "split_file",
+  "active_file_income",
   "column_break_hrkw",
   "market_id",
   "market_description",
@@ -334,13 +336,25 @@
    "fieldname": "receipt_type",
    "fieldtype": "Data",
    "label": "Receipt Type"
+  },
+  {
+   "fieldname": "split_file",
+   "fieldtype": "Link",
+   "label": "Split File",
+   "options": "Split File"
+  },
+  {
+   "fieldname": "active_file_income",
+   "fieldtype": "Link",
+   "label": "Active File Income",
+   "options": "Active File Income"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-19 17:01:33.964610",
+ "modified": "2025-12-04 14:44:48.588377",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Import",

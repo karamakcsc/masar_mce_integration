@@ -18,9 +18,7 @@
   "file_name",
   "column_break_dubo",
   "start_time",
-  "end_time",
-  "tab_2_tab",
-  "split_files"
+  "end_time"
  ],
  "fields": [
   {
@@ -99,24 +97,13 @@
    "fieldname": "end_time",
    "fieldtype": "Datetime",
    "label": "End Time"
-  },
-  {
-   "fieldname": "tab_2_tab",
-   "fieldtype": "Tab Break",
-   "label": "Split Files"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "split_files",
-   "fieldtype": "Table",
-   "options": "Split File Details"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-03 17:52:09.286536",
+ "modified": "2025-12-04 11:41:02.203215",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "Active File Income",

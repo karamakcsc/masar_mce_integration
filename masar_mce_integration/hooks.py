@@ -156,7 +156,8 @@ doc_events = {
 # # 		"masar_mce_integration.tasks.daily"
 # # 	],
 # 	"hourly": [
-# 		"masar_mce_integration.tasks.check_active_paths"
+# 		"masar_mce_integration.tasks.check_active_paths",
+#       "masar_mce_integration.tasks.process_pending_split_files"
 # 	],
 # # 	"weekly": [
 # # 		"masar_mce_integration.tasks.weekly"

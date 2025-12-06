@@ -5,8 +5,9 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "api_ref",
+  "active_file_income",
   "status",
+  "split_file",
   "column_break_jkpd",
   "invoice_pk",
   "row_pk",
@@ -142,12 +143,6 @@
    "fieldname": "status",
    "fieldtype": "Data",
    "label": "Status"
-  },
-  {
-   "fieldname": "api_ref",
-   "fieldtype": "Link",
-   "label": "API Data Income",
-   "options": "Active File Income"
   },
   {
    "fieldname": "column_break_tqso",
@@ -358,12 +353,24 @@
    "fieldname": "payment_method",
    "fieldtype": "Data",
    "label": "Payment Method"
+  },
+  {
+   "fieldname": "active_file_income",
+   "fieldtype": "Link",
+   "label": "Active File Income",
+   "options": "Active File Income"
+  },
+  {
+   "fieldname": "split_file",
+   "fieldtype": "Link",
+   "label": "Split File",
+   "options": "Split File"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-03 15:49:48.168260",
+ "modified": "2025-12-04 12:35:58.960006",
  "modified_by": "Administrator",
  "module": "Masar MCE Integration",
  "name": "POS Data Income",

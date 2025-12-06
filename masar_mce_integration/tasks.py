@@ -1,12 +1,5 @@
-import frappe
-import os
-import json
-import shutil
-import time
-import ijson
-
-from datetime import datetime
-from collections import defaultdict, OrderedDict
+import frappe, os, json , shutil , time , ijson
+from collections import  OrderedDict
 
 def check_active_paths():
     try:
@@ -21,6 +14,7 @@ def check_active_paths():
         if not files:
             return
         batch_size = int(getattr(settings, "batch_size", 1000) or 1000)
+        print(f"Detected {len(files)} files in active path.")
         for file in files:
             try:
                 file_path = os.path.join(active_path, file)
@@ -94,6 +88,7 @@ def process_active_file_income_into_progress(file_income):
         frappe.db.set_value("Active File Income", doc.name, {
             "status_description": f"Processing file ({file_size_mb:.1f} MB)..."
         })
+        print(f"Processing file {doc.name} of size {file_size_mb:.1f} MB with batch size {batch_size}")
         split_files = split_json_memory_efficient(
             input_file=temp_file_path,
             output_dir=progress_dir,
@@ -101,18 +96,29 @@ def process_active_file_income_into_progress(file_income):
             file_base=file_base_name,
             doc_name=doc.name
         )
+        print(f"Split files created: {len(split_files)}")
         try:
             os.remove(temp_file_path)
         except Exception:
             pass
+        print(f"File moved to progress directory: {temp_file_path}")
         create_split_file_records(doc.name, split_files, progress_dir)
-
+        print(f"Created split file records for {doc.name}")
         frappe.db.set_value("Active File Income", doc.name, {
             "status": "Completed",
             "status_description": f"File successfully split into {len(split_files)} batches",
             "end_time": frappe.utils.now()
         })
-        process_split_files(doc.name)
+        frappe.db.commit()
+        print(f"File {doc.name} split into {len(split_files)} batches.")
+        frappe.enqueue(
+                "masar_mce_integration.tasks.process_split_files",
+                active_file_name=doc.name,
+                queue='long',
+                timeout=3600,
+                is_async=True,
+                job_id=f"process_split_{doc.name}"
+            )
     except Exception:
         error_msg = f"Failed to process file: {frappe.get_traceback()}"
         try:
@@ -121,6 +127,7 @@ def process_active_file_income_into_progress(file_income):
                 "status_description": error_msg,
                 "end_time": frappe.utils.now()
             })
+            frappe.db.commit()
         except Exception:
             pass
         frappe.log_error(frappe.get_traceback(), "MCE File Processing Error")
@@ -280,11 +287,9 @@ def count_json_records(file_path):
             return 0
 def create_split_file_records(parent_doc, split_files, progress_dir):
     try:
-        parent = frappe.get_doc("Active File Income", parent_doc)
         for i, file_path in enumerate(split_files, 1):
             file_name = os.path.basename(file_path)
             record_count = count_json_records(file_path)
-
             split_doc = frappe.get_doc({
                 "doctype": "Split File",
                 "parent_active_file": parent_doc,
@@ -295,38 +300,50 @@ def create_split_file_records(parent_doc, split_files, progress_dir):
                 "total_records": record_count
             })
             split_doc.insert(ignore_permissions=True)
-
-            parent.append("split_files", {
-                "split_file": split_doc.name,
-                "file_name": file_name,
-                "batch_number": i,
-                "status": "Pending",
-                "total_records": record_count,
-                "file_path": file_path
-            })
-
-        parent.save(ignore_permissions=True)
         frappe.db.commit()
         frappe.logger().info(f"Created {len(split_files)} split file records for {parent_doc}")
     except Exception:
         frappe.log_error(frappe.get_traceback(), "Create Split File Records Error")
         raise
 def process_split_files(active_file_name):
-    """Start processing each split file"""
     try:
         split_files = frappe.get_all("Split File",
-                                    filters={"parent_active_file": active_file_name, "status": "Pending"},
-                                    fields=["name", "file_name", "file_path", "batch_number"])
+                filters={
+                        "parent_active_file": active_file_name,
+                        "status": ["in", ["Pending", "Failed"]]
+                    },
+                fields=["name", "file_name", "file_path", "batch_number"])
+        print(f"Found {len(split_files)} split files to process for active file: {active_file_name}")
         for split_file in split_files:
-            frappe.logger().info(f"Processing split file: {split_file.file_name}")
-            # Example: enqueue the per-split-file worker (uncomment & set path)
-            # frappe.enqueue(
-            #     "masar_mce_integration.tasks.process_single_split_file",
-            #     split_file_name=split_file.name,
-            #     queue='long',
-            #     timeout=3600,
-            #     is_async=True,
-            #     job_name=f"process_split_{split_file.name}"
-            # )
+            print(f"Enqueuing processing for split file: {split_file.name}")
+            frappe.enqueue(
+                "masar_mce_integration.utils.process_single_split_file",
+                split_file_name=split_file.name,
+                queue='long',
+                timeout=3600,
+                is_async=True,
+                job_id=f"process_split_{split_file.name}"
+            )
     except Exception:
         frappe.log_error(frappe.get_traceback(), "Process Split Files Error")
+
+
+
+@frappe.whitelist()
+def process_pending_split_files():
+    try:
+        active_files_with_pending = frappe.db.sql("""
+            SELECT DISTINCT parent_active_file 
+            FROM `tabSplit File` 
+            WHERE status = 'Pending'
+            ORDER BY creation
+        """, as_dict=True)
+        for active_file in active_files_with_pending:
+            active_file_name = active_file.parent_active_file
+            active_file_doc = frappe.get_doc("Active File Income", active_file_name)
+            if active_file_doc.status == "Failed":
+                continue 
+            print(f"Processing pending split files for active file: {active_file_name}")
+            process_split_files(active_file_name)
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "Process Pending Split Files Error")
