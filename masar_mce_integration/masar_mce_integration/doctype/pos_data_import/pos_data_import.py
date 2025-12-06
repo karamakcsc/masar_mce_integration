@@ -315,9 +315,9 @@ class POSDataImport(Document):
 
     def set_custom_fields_for_return_item(self, return_item, original_item):
         item_custom_fields_mapping = {
-            "custom_api_data_income": "custom_api_data_income",
+            "custom_active_file_income": "custom_active_file_income",
+            "custom_split_file" : "custom_split_file",
             "custom_pos_data_import": "custom_pos_data_import",
-            "custom_pos_data_check": "custom_pos_data_check", 
             "custom_pos_data_import_item": "custom_pos_data_import_item",
             "custom_invoice_pk": "custom_invoice_pk",
             "custom_row_pk": "custom_row_pk"
@@ -482,10 +482,11 @@ class POSDataImport(Document):
     def set_custom_fields_for_sales_invoice_item(self, sales_invoice_item, pos_data_import_item):
         """Set custom fields for sales invoice items"""
         item_custom_fields_mapping = {
-            "api_ref": "custom_api_data_income",
+            "active_file_income": "custom_active_file_income",
             "pos_data_check": "custom_pos_data_check",
             "invoice_pk": "custom_invoice_pk",
-            "row_pk": "custom_row_pk"
+            "row_pk": "custom_row_pk", 
+            "split_file" : "custom_split_file" 
         }
         for source_field, target_field in item_custom_fields_mapping.items():
             source_value = getattr(pos_data_import_item, source_field, None)
