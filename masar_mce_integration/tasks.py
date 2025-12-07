@@ -321,7 +321,6 @@ def process_split_files(active_file_name):
                 split_file_name=split_file.name,
                 queue='long',
                 timeout=3600,
-                is_async=True,
                 job_id=f"process_split_{split_file.name}"
             )
     except Exception:
