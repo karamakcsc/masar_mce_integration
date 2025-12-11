@@ -316,7 +316,8 @@ def process_split_files(active_file_name):
                 "masar_mce_integration.utils.process_single_split_file",
                 split_file_name=split_file.name,
                 queue='long',
-                timeout=3600,
+                timeout=10000,
+                is_async=True,
                 job_id=f"process_split_{split_file.name}"
             )
     except Exception:
