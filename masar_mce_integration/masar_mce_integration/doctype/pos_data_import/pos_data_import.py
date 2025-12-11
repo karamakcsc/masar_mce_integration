@@ -296,7 +296,9 @@ class POSDataImport(Document):
             "cashier_name": "custom_cashier_name",
             "customer_no": "custom_customer_no",
             "customer_ref": "custom_customer_ref",
-            "customer_type": "custom_customer_type"
+            "customer_type": "custom_customer_type",
+            "discount_value" : "discount_amount" , 
+            "discount_percent" : "additional_discount_percentage" 
         }
         for source_field, target_field in custom_fields_mapping.items():
             source_value = getattr(self, source_field, None)
