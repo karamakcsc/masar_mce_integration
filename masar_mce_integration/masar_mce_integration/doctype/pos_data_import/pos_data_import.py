@@ -59,6 +59,10 @@ class POSDataImport(Document):
             errors.append(_("Mode of Payment {0} does not exist.").format(self.payment_method))
 
         for row in (self.items or []):
+            qty = flt(row.quantity)
+            amt = flt(row.amount)
+            total_qty += qty
+            total_amount += amt
             barcode = getattr(row, "barcode", None)
             if not barcode:
                 errors.append(_("Row {0}: Missing barcode").format(row.idx))
@@ -68,11 +72,7 @@ class POSDataImport(Document):
                 errors.append(_("Row {0}: Barcode {1} not found in Item").format(row.idx, barcode))
                 continue
             item_code = frappe.db.get_value("Item Barcode", {"barcode": barcode}, "parent")
-            row.item_code = item_code
-            qty = flt(row.quantity)
-            amt = flt(row.amount)
-            total_qty += qty
-            total_amount += amt
+            row.item_code = item_code    
 
         parent_total_qty = flt(self.total_quantity)
         parent_total_amount = flt(
