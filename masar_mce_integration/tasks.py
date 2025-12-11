@@ -68,11 +68,7 @@ def process_active_file_income_into_progress(file_income):
             })
             frappe.log_error(error_msg, "MCE File Processing")
             return
-        batch_size = int(getattr(doc, "batch_size", 100) or 100)
-        if batch_size <= 0:
-            batch_size = 100
-        elif batch_size > 5000:
-            batch_size = 5000
+        batch_size = int(getattr(doc, "batch_size", 1000) or 1000)
         file_base_name = os.path.splitext(doc.file_name)[0]
         progress_dir = os.path.join(settings.in_progress_path, file_base_name)
         os.makedirs(progress_dir, exist_ok=True)
