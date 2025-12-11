@@ -520,13 +520,12 @@ def master_data_check_execute(split_file=None):
     if split_file:
         extra_where = " AND c.split_file = %s "
         params.append(split_file)
-
-    # ---------------------------
-    # Build the query correctly
-    # ---------------------------
     query_template = """
         WITH items AS (
-            SELECT name as item_code FROM tabItem
+            SELECT 
+                ib.barcode AS barcode,
+                ib.parent AS item_code
+            FROM `tabItem Barcode` ib
         ), 
         pos_profiles AS (
             SELECT name AS pos_profile FROM `tabPOS Profile`
@@ -549,13 +548,13 @@ def master_data_check_execute(split_file=None):
                 c.invoice_pk,
                 c.row_pk,
                 c.idx,
-                CASE 
-                    WHEN i.item_code IS NULL THEN 'Rejected'
+               CASE
+                    WHEN i.barcode IS NULL THEN 'Rejected'
                     ELSE 'Checked'
-                END AS row_status, 
+                END AS row_status,
                 CASE
-                    WHEN i.item_code IS NULL THEN 
-                    CONCAT(c.idx, '- Item code not found in Item')
+                    WHEN i.barcode IS NULL THEN 
+                        CONCAT(c.idx, '- Barcode not found in Item')
                     ELSE NULL
                 END AS row_rejected_reason,
                 c.market_id, 
@@ -595,7 +594,7 @@ def master_data_check_execute(split_file=None):
                 c.active_file_income,
                 c.split_file
             FROM `tabPOS Data Check` AS c 
-            LEFT JOIN items AS i ON i.item_code = c.item_code 
+            LEFT JOIN items AS i ON i.barcode = c.barcode 
             WHERE c.imported = 0 
                 {extra_where}
             ORDER BY c.market_id, c.pos_no, c.current_year, c.receipt_no, c.idx

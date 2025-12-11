@@ -59,8 +59,16 @@ class POSDataImport(Document):
             errors.append(_("Mode of Payment {0} does not exist.").format(self.payment_method))
 
         for row in (self.items or []):
-            if not row.item_code or not frappe.db.exists("Item", row.item_code):
-                errors.append(_("Row {0}: Item {1} does not exist.").format(row.idx, row.item_code or _("(empty)")))
+            barcode = getattr(row, "barcode", None)
+            if not barcode:
+                errors.append(_("Row {0}: Missing barcode").format(row.idx))
+                continue
+            exists = frappe.db.exists("Item Barcode", {"barcode": barcode})
+            if not exists:
+                errors.append(_("Row {0}: Barcode {1} not found in Item").format(row.idx, barcode))
+                continue
+            item_code = frappe.db.get_value("Item Barcode", {"barcode": barcode}, "parent")
+            row.item_code = item_code
             qty = flt(row.quantity)
             amt = flt(row.amount)
             total_qty += qty
@@ -117,7 +125,8 @@ class POSDataImport(Document):
             return
 
         for row in (self.items or []):
-            item_code = row.item_code
+            item_code = frappe.db.get_value("Item Barcode", {"barcode": row.barcode}, "parent")
+            row.item_code = item_code
             if not item_code:
                 not_available.append(_("Row {0}: missing item_code").format(row.idx))
                 continue
@@ -471,7 +480,9 @@ class POSDataImport(Document):
             "cashier_name": "custom_cashier_name",
             "customer_no": "custom_customer_no",
             "customer_ref": "custom_customer_ref",
-            "customer_type": "custom_customer_type"
+            "customer_type": "custom_customer_type", 
+            "discount_value" : "discount_amount" , 
+            "discount_percent" : "additional_discount_percentage" 
         }
 
         for source_field, target_field in custom_fields_mapping.items():
